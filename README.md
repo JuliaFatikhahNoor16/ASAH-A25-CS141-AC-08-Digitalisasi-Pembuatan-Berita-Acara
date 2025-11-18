@@ -24,7 +24,7 @@ https://www.figma.com/design/UOpytjFV5lGxTvxwwmqXSe/Capstone?node-id=2-2&p=f&t=k
 
 3. Proses oleh Vendor
 
-    Jika pengguna terdeteksi sebagai Vendor, sistem akan menampilkan Dashboard Vendor. Dari dashboard ini, Vendor dapat memilih menu untuk membuat dokumen baru. Pada tahap pembuatan dokumen, Vendor diwajibkan memilih jenis dokumen, yaitu BA/BPE atau BA/BPP, di mana masing-masing jenis memiliki format dan informasi yang berbeda.
+    Jika pengguna terdeteksi sebagai Vendor, sistem akan menampilkan Dashboard Vendor. Dari dashboard ini, Vendor dapat memilih menu untuk membuat dokumen baru. Pada tahap pembuatan dokumen, Vendor diwajibkan memilih jenis dokumen, yaitu BAPP atau BAPB, di mana masing-masing jenis memiliki format dan informasi yang berbeda.
 
     Setelah memilih jenis dokumen, Vendor mengisi form sesuai format dokumen tersebut. Vendor juga dapat memilih salah satu dari dua tindakan berikut:
 

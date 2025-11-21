@@ -1,1 +1,237 @@
-home sebelum login
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiBA - Digitalisasi Berita Acara</title>
+    <meta name="description" content="Sistem Digitalisasi Berita Acara yang Cepat, Transparan, dan Efisien">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur">
+        <div class="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+            <div class="flex items-center gap-2">
+                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white font-bold">
+                    D
+                </div>
+                <span class="text-xl font-bold text-blue-900">DigiBA</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+                <a href="#fitur" class="hover:text-blue-600 transition-colors">Fitur</a>
+                <a href="#login" class="hover:text-blue-600 transition-colors">Masuk</a>
+                <a href="#kontak" class="hover:text-blue-600 transition-colors">Kontak</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <a href="#login" class="inline-flex h-9 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700">
+                    Mulai Sekarang
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="py-20 md:py-32 bg-gradient-to-b from-white to-blue-50">
+            <div class="container mx-auto px-4 md:px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-6">
+                    Digitalisasi Berita Acara <br class="hidden md:inline">
+                    <span class="text-blue-600">Lebih Cepat & Transparan</span>
+                </h1>
+                <p class="mx-auto max-w-[700px] text-lg text-slate-600 mb-10 leading-relaxed">
+                    Sistem modern untuk mengelola, melacak, dan mengarsipkan berita acara pemerintahan dan bisnis dengan
+                    efisiensi tinggi. Tinggalkan cara lama, beralih ke digital.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#login" class="inline-flex h-12 items-center justify-center rounded-md bg-blue-600 px-8 text-base font-medium text-white shadow transition-colors hover:bg-blue-700">
+                        Masuk ke Sistem
+                    </a>
+                    <a href="#fitur" class="inline-flex h-12 items-center justify-center rounded-md border border-slate-200 bg-white px-8 text-base font-medium text-slate-900 shadow-sm transition-colors hover:bg-slate-100">
+                        Pelajari Lebih Lanjut
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="fitur" class="py-20 bg-white">
+            <div class="container mx-auto px-4 md:px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4">
+                        Mengapa Memilih DigiBA?
+                    </h2>
+                    <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+                        Platform kami dirancang khusus untuk meningkatkan produktivitas dan akuntabilitas instansi Anda.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="flex flex-col items-center text-center p-6 rounded-xl border border-slate-100 bg-slate-50 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="h-14 w-14 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 mb-6 text-3xl">
+                            ⚡
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Efisiensi Tinggi</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            Otomatisasi proses pembuatan dan pengarsipan dokumen menghemat waktu hingga 70% dibandingkan cara manual.
+                        </p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="flex flex-col items-center text-center p-6 rounded-xl border border-slate-100 bg-slate-50 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="h-14 w-14 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 mb-6 text-3xl">
+                            👁️
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Transparansi Penuh</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            Setiap perubahan dan persetujuan tercatat dalam log sistem yang tidak dapat diubah, menjamin akuntabilitas.
+                        </p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="flex flex-col items-center text-center p-6 rounded-xl border border-slate-100 bg-slate-50 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="h-14 w-14 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 mb-6 text-3xl">
+                            🚀
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Kecepatan Akses</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            Cari dan temukan dokumen berita acara dalam hitungan detik dengan sistem pencarian cerdas berbasis metadata.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Login Section -->
+        <section id="login" class="py-20 bg-slate-50 border-t border-slate-200">
+            <div class="container mx-auto px-4 md:px-6">
+                <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-slate-100">
+                    <div class="p-8">
+                        <div class="text-center mb-8">
+                            <h3 class="text-2xl font-bold text-slate-900">Masuk ke DigiBA</h3>
+                            <p class="text-slate-500 mt-2">Silakan masukkan kredensial Anda</p>
+                        </div>
+                        <form class="space-y-4" onsubmit="handleLogin(event)">
+                            <div class="space-y-2">
+                                <label for="email" class="text-sm font-medium text-slate-700 block">
+                                    Email Instansi
+                                </label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    placeholder="nama@instansi.go.id"
+                                    class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                                    required
+                                />
+                            </div>
+                            <div class="space-y-2">
+                                <label for="password" class="text-sm font-medium text-slate-700 block">
+                                    Kata Sandi
+                                </label>
+                                <input
+                                    id="password"
+                                    type="password"
+                                    class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                                    required
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                class="w-full inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+                            >
+                                Masuk
+                            </button>
+                        </form>
+                        <div class="mt-6 text-center text-sm">
+                            <a href="#" class="text-blue-600 hover:underline font-medium">
+                                Lupa kata sandi?
+                            </a>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 px-8 py-4 border-t border-slate-100 text-center text-sm text-slate-500">
+                        Belum punya akun?
+                        <a href="#" class="text-blue-600 hover:underline font-medium">
+                            Hubungi Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="kontak" class="bg-slate-900 text-slate-300 py-12">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white font-bold">
+                            D
+                        </div>
+                        <span class="text-xl font-bold text-white">DigiBA</span>
+                    </div>
+                    <p class="text-slate-400 max-w-xs leading-relaxed">
+                        Sistem Digitalisasi Berita Acara terdepan untuk instansi pemerintah dan perusahaan swasta.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Tautan</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition-colors">Beranda</a></li>
+                        <li><a href="#fitur" class="hover:text-white transition-colors">Fitur</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Tentang Kami</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Bantuan</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Kontak</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li>info@digiba.id</li>
+                        <li>+62 21 555 0123</li>
+                        <li>Jakarta, Indonesia</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
+                &copy; <span id="year"></span> DigiBA. Hak Cipta Dilindungi.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Handle login form submission
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Demo purposes - replace with actual authentication
+            alert('Login demo: Email = ' + email);
+            
+            // In production, you would send this to a backend API
+            // fetch('/api/login', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ email, password })
+            // });
+        }
+    </script>
+</body>
+</html>

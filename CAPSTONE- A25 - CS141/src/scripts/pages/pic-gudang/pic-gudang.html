@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../../../styles/pic-gudang/pic-dashboard.css">
 </head>
 <body class="pic-gudang">
-    <div class="dashboard-layout">
+    <div id="app" class="dashboard-layout">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -17,24 +17,8 @@
                 <h2>PIC Gudang</h2>
             </div>
             
-            <nav class="sidebar-nav">
-                <a href="#dashboard" class="nav-item active" data-page="dashboard">
-                    <span class="nav-icon">📊</span>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#approvals" class="nav-item" data-page="approvals">
-                    <span class="nav-icon">✅</span>
-                    <span>Persetujuan BAPB</span>
-                </a>
-                <a href="#documents" class="nav-item" data-page="documents">
-                    <span class="nav-icon">📄</span>
-                    <span>Dokumen Overview</span>
-                </a>
-                <a href="#notifications" class="nav-item" data-page="notifications">
-                    <span class="nav-icon">🔔</span>
-                    <span>Notifikasi</span>
-                    <span class="badge">3</span>
-                </a>
+            <nav class="sidebar-nav" id="sidebar-nav">
+                <!-- Navigation will be rendered by JavaScript -->
             </nav>
             
             <div class="sidebar-footer">
@@ -45,191 +29,17 @@
                         <div class="user-role">PIC Gudang</div>
                     </div>
                 </div>
-                <button class="btn-logout" onclick="picDashboard.logout()">Keluar</button>
+                <button class="btn-logout" id="logout-btn">Keluar</button>
             </div>
         </aside>
         
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Dashboard Page -->
-            <div id="dashboard-page" class="page-content active">
-                <div class="page-header">
-                    <h1>Dashboard</h1>
-                    <p>Selamat datang di PIC Gudang Dashboard</p>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon blue">📦</div>
-                        <div class="stat-info">
-                            <h3>Total BAPB</h3>
-                            <p class="stat-value" data-stat="total">0</p>
-                            <p class="stat-change positive">+12% dari bulan lalu</p>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon yellow">⏳</div>
-                        <div class="stat-info">
-                            <h3>Menunggu Persetujuan</h3>
-                            <p class="stat-value" data-stat="pending">0</p>
-                            <p class="stat-change">Perlu ditinjau</p>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon green">✅</div>
-                        <div class="stat-info">
-                            <h3>Disetujui</h3>
-                            <p class="stat-value" data-stat="approved">0</p>
-                            <p class="stat-change positive">+8% dari bulan lalu</p>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon red">❌</div>
-                        <div class="stat-info">
-                            <h3>Ditolak</h3>
-                            <p class="stat-value" data-stat="rejected">0</p>
-                            <p class="stat-change negative">-2% dari bulan lalu</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="content-grid">
-                    <div class="card">
-                        <h2>BAPB Terbaru</h2>
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>No. BAPB</th>
-                                        <th>Tanggal</th>
-                                        <th>Supplier</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Data akan diisi oleh JavaScript -->
-                                    <tr>
-                                        <td colspan="4" class="text-center">Memuat data...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h2>Aktivitas Terkini</h2>
-                        <div class="activity-list">
-                            <div class="activity-item">
-                                <div class="activity-icon blue">⏳</div>
-                                <div class="activity-content">
-                                    <p>Memuat aktivitas...</p>
-                                    <span class="activity-time">-</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Approvals Page -->
-            <div id="approvals-page" class="page-content">
-                <div class="page-header">
-                    <h1>Persetujuan BAPB</h1>
-                    <p>Tinjau dan setujui dokumen BAPB</p>
-                </div>
-                
-                <div class="card">
-                    <div class="filter-bar">
-                        <input type="text" placeholder="Cari BAPB..." class="search-input">
-                        <select class="filter-select">
-                            <option>Semua Status</option>
-                            <option>Pending</option>
-                            <option>Disetujui</option>
-                            <option>Ditolak</option>
-                        </select>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>No. BAPB</th>
-                                    <th>Tanggal</th>
-                                    <th>Supplier</th>
-                                    <th>Total Item</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="6" class="text-center">Memuat data persetujuan...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Documents Page -->
-            <div id="documents-page" class="page-content">
-                <div class="page-header">
-                    <h1>Dokumen Overview</h1>
-                    <p>Kelola dan lihat semua dokumen BAPB</p>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon blue">📄</div>
-                        <div class="stat-info">
-                            <h3>Total Dokumen</h3>
-                            <p class="stat-value" data-stat="total-documents">0</p>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon green">📊</div>
-                        <div class="stat-info">
-                            <h3>Dokumen Bulan Ini</h3>
-                            <p class="stat-value" data-stat="monthly-documents">0</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <h2>Daftar Dokumen</h2>
-                    <div class="document-grid">
-                        <div class="document-card">
-                            <div class="document-icon">⏳</div>
-                            <h3>Memuat dokumen...</h3>
-                            <p>Tanggal: -</p>
-                            <button class="btn btn-sm btn-primary" disabled>Unduh</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Notifications Page -->
-            <div id="notifications-page" class="page-content">
-                <div class="page-header">
-                    <h1>Notifikasi</h1>
-                    <p>Lihat semua notifikasi terbaru</p>
-                </div>
-                
-                <div class="card">
-                    <div class="notification-list">
-                        <div class="notification-item">
-                            <div class="notification-icon blue">⏳</div>
-                            <div class="notification-content">
-                                <h3>Memuat notifikasi...</h3>
-                                <p>Silakan tunggu sebentar</p>
-                                <span class="notification-time">-</span>
-                            </div>
-                        </div>
-                    </div>
+            <div id="page-content">
+                <!-- Page content will be rendered dynamically -->
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p>Memuat dashboard...</p>
                 </div>
             </div>
         </main>

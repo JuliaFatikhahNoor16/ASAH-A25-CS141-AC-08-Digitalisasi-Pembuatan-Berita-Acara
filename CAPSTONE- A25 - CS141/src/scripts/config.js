@@ -69,6 +69,15 @@ const DOCUMENT_STATUS = {
 const STORAGE_KEYS = {
     USER_DATA: 'user_data',
     AUTH_TOKEN: 'auth_token',
+    NOTIFICATIONS: 'notifications',
+    CURRENT_PAGE: 'current_page'
+};
+
+// Routes Configuration
+const ROUTES = {
+    DASHBOARD: 'dashboard',
+    APPROVALS: 'approvals',
+    DOCUMENTS: 'documents',
     NOTIFICATIONS: 'notifications'
 };
 
@@ -77,5 +86,6 @@ window.APP_CONFIG = {
     API_BASE_URL,
     ROLES,
     DOCUMENT_STATUS,
-    STORAGE_KEYS
+    STORAGE_KEYS,
+    ROUTES
 };

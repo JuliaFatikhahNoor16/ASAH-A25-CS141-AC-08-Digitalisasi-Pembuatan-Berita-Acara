@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Vendor - DigiBA</title>
+    
+    <!-- CSS Files - Fixed Paths -->
+    <link rel="stylesheet" href="../../../styles/main.css">
+    <link rel="stylesheet" href="../../../styles/component.css">
+    <link rel="stylesheet" href="../../../styles/vendor/vendor-dashboard.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-logo">DigiBA</h1>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#/vendor/dashboard" class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#/vendor/tambah-dokumen" class="nav-item" data-page="tambah-dokumen">
+                    <i class="fas fa-plus"></i>
+                    <span>Tambah Dokumen</span>
+                </a>
+                <a href="#/vendor/dokumen-saya" class="nav-item" data-page="dokumen-saya">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Dokumen Saya</span>
+                </a>
+                <a href="#/vendor/notifikasi" class="nav-item" data-page="notifikasi">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifikasi</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">PT. Vendor</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h2 class="page-title">Dashboard Vendor</h2>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Cari dokumen..." id="searchInput">
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-icon" id="btnProfile" title="Profile">
+                            <i class="fas fa-user-circle"></i>
+                        </button>
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <a href="#/vendor/profile" class="dropdown-item">
+                                <i class="fas fa-user"></i> Edit Profile
+                            </a>
+                            <a href="#" class="dropdown-item" id="btnLogout">
+                                <i class="fas fa-sign-out-alt"></i> Keluar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Welcome Section -->
+                <div class="welcome-card">
+                    <div class="welcome-illustration">
+                        <i class="fas fa-file-invoice" style="font-size: 64px; color: white;"></i>
+                    </div>
+                    <div class="welcome-text">
+                        <h3>Selamat Datang, PT. Vendor!</h3>
+                        <p>Selamat Datang, PT. Vendor!</p>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid" id="statsCards">
+                    <div class="stat-card stat-draft">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Total Draft</h4>
+                            <p class="stat-number">2</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card stat-pending">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Menunggu Persetujuan</h4>
+                            <p class="stat-number">3</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card stat-approved">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Disetujui</h4>
+                            <p class="stat-number">4</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="activity-section">
+                    <h3 class="section-title">Aktivitas Terbaru</h3>
+                    
+                    <div class="table-container">
+                        <table class="data-table" id="activityTable">
+                            <thead>
+                                <tr>
+                                    <th>No Dokumen</th>
+                                    <th>Jenis Dokumen</th>
+                                    <th>Tanggal Dibuat</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <div class="loading">Memuat data...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination" id="pagination">
+                        <div class="pagination-info">
+                            Tampilkan 1 sampai 6 dari 6 entri
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="btn-pagination" id="btnFirst" disabled>
+                                Awal
+                            </button>
+                            <button class="btn-pagination" id="btnPrev" disabled>
+                                Balik
+                            </button>
+                            <div class="pagination-numbers">
+                                <button class="btn-page active">1</button>
+                            </div>
+                            <button class="btn-pagination" id="btnNext">
+                                Lanjut
+                            </button>
+                            <button class="btn-pagination" id="btnLast">
+                                Akhir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="./vendor.js"></script>
+</body>
+</html>

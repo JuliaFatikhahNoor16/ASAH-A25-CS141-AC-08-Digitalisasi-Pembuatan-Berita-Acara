@@ -1,0 +1,72 @@
+/* PIC Gudang Specific Styles */
+.pic-gudang {
+    display: block
+}
+
+/* Approval actions */
+.approval-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Document status specific to PIC */
+.status-badge.verified {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.status-badge.checked {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+/* Responsive improvements for PIC dashboard */
+@media (max-width: 768px) {
+    .approval-actions {
+        flex-direction: column;
+    }
+    
+    .approval-actions .btn {
+        margin-right: 0;
+        margin-bottom: 4px;
+    }
+}
+
+/* PIC specific overrides */
+.pic-gudang .sidebar {
+    border-right: 3px solid #10b981;
+}
+
+.pic-gudang .nav-item.active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* Text center utility */
+.text-center {
+    text-align: center;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Custom scrollbar for sidebar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}

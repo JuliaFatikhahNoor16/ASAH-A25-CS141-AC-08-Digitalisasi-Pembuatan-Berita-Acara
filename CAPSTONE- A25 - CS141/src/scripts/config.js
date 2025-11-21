@@ -47,4 +47,35 @@ export const DOCUMENT_STATUS = {
 export const DOCUMENT_TYPES = {
     bapb: 'BAPB',
     bapp: 'BAPP',
+
+};
+
+// Role Configuration
+const ROLES = {
+    VENDOR: 'vendor',
+    PIC_GUDANG: 'pic_gudang',
+    DIREKSI: 'direksi'
+};
+
+// Document Status
+const DOCUMENT_STATUS = {
+    DRAFT: 'draft',
+    PENDING: 'pending',
+    APPROVED: 'approved',
+    REJECTED: 'rejected'
+};
+
+// Local Storage Keys
+const STORAGE_KEYS = {
+    USER_DATA: 'user_data',
+    AUTH_TOKEN: 'auth_token',
+    NOTIFICATIONS: 'notifications'
+};
+
+// Export to global scope
+window.APP_CONFIG = {
+    API_BASE_URL,
+    ROLES,
+    DOCUMENT_STATUS,
+    STORAGE_KEYS
 };

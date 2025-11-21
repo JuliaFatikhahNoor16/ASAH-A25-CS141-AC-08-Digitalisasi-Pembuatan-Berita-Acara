@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Direksi - Sistem BA</title>
+    <link rel="stylesheet" href="../src/styles/main.css">
+    <link rel="stylesheet" href="../src/styles/dashboard.css">
+    <link rel="stylesheet" href="../src/styles/components.css">
+    <link rel="stylesheet" href="../src/styles/accessibility.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Langsung ke konten utama</a>
+    
+    <header role="banner" id="header-container">
+        <!-- Header Direksi -->
+    </header>
+
+    <div class="dashboard-layout">
+        <aside role="navigation" aria-label="Navigasi Direksi" id="sidebar-container">
+            <!-- Sidebar Direksi -->
+        </aside>
+
+        <main id="main-content" role="main" class="dashboard-main">
+            <!-- Welcome Banner -->
+            <section aria-labelledby="welcome-heading" class="welcome-banner direksi-banner">
+                <h1 id="welcome-heading">Dashboard Direksi</h1>
+                <p><span class="highlight">6 dokumen</span> membutuhkan tanda tangan digital Anda</p>
+            </section>
+
+            <!-- TTD Required -->
+            <section aria-labelledby="ttd-heading" class="documents-section">
+                <h2 id="ttd-heading" class="section-title">Dokumen Butuh TTD Digital</h2>
+                <div class="ttd-documents">
+                    <!-- Documents needing TTD -->
+                    <div class="ttd-card" data-doc-id="BAPB-2024-001">
+                        <div class="ttd-info">
+                            <h3>BAPB-2024-001</h3>
+                            <p>Dari: PIC Gudang - Ahmad</p>
+                            <p>Vendor: PT. Jaya Abadi</p>
+                        </div>
+                        <button class="btn-ttd" aria-label="Beri TTD Digital untuk BAPB-2024-001">
+                            TTD Digital
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="js/direksi-dashboard.js"></script>
+</body>
+</html>

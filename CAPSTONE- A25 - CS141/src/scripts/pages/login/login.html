@@ -120,6 +120,7 @@
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
@@ -130,6 +131,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -180,6 +182,23 @@
             text-decoration: underline;
         }
 
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #294898;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(41, 72, 152, 0.1);
+        }
+
         @media (max-width: 480px) {
             .auth-container {
                 padding: 30px 15px;
@@ -206,13 +225,18 @@
     <div class="auth-container">
         <div class="form-box">
 
-            <h1>DigiBA</h1> 
+            <h1>DigiBA</h1>
 
             <form id="loginFormSubmit">
 
                 <div class="input-group">
-                    <label>Username</label>
-                    <input type="text" id="loginUser" placeholder="Masukkan username" required>
+                    <label>Login sebagai</label>
+                    <select id="loginRole" required>
+                        <option value="">-- Pilih Role --</option>
+                        <option value="gudang">PIC Gudang</option>
+                        <option value="direksi">Direksi</option>
+                        <option value="vendor">Vendor</option>
+                    </select>
                 </div>
 
                 <div class="input-group">

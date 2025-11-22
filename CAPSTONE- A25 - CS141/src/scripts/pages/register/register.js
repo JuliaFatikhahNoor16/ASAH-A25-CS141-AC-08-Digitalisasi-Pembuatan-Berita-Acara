@@ -18,12 +18,12 @@ const RegisterModule = (() => {
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message show';
         errorDiv.textContent = message;
-        
+
         const existingError = input.parentElement.querySelector('.error-message');
         if (existingError) {
             existingError.remove();
         }
-        
+
         input.parentElement.appendChild(errorDiv);
     }
 
@@ -42,7 +42,7 @@ const RegisterModule = (() => {
         successDiv.className = 'success-message show';
         successDiv.textContent = message;
         form.insertBefore(successDiv, form.firstChild);
-        
+
         setTimeout(() => {
             successDiv.remove();
         }, 3000);
@@ -51,25 +51,25 @@ const RegisterModule = (() => {
     // Initialize register form
     function init() {
         const registerFormSubmit = document.getElementById('registerFormSubmit');
-        
+
         if (!registerFormSubmit) return;
 
         // Handle submit
-        registerFormSubmit.addEventListener('submit', function(e) {
+        registerFormSubmit.addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
             const username = document.getElementById('registerUsername');
             const email = document.getElementById('registerEmail');
             const password = document.getElementById('registerPassword');
             const confirmPassword = document.getElementById('registerConfirmPassword');
-            
+
             let isValid = true;
-            
+
             clearError(username);
             clearError(email);
             clearError(password);
             clearError(confirmPassword);
-            
+
             if (username.value.trim() === '') {
                 showError(username, 'Username tidak boleh kosong');
                 isValid = false;
@@ -77,7 +77,7 @@ const RegisterModule = (() => {
                 showError(username, 'Username minimal 4 karakter');
                 isValid = false;
             }
-            
+
             if (email.value.trim() === '') {
                 showError(email, 'Email/Phone tidak boleh kosong');
                 isValid = false;
@@ -85,7 +85,7 @@ const RegisterModule = (() => {
                 showError(email, 'Format email atau nomor telepon tidak valid');
                 isValid = false;
             }
-            
+
             if (password.value.trim() === '') {
                 showError(password, 'Password tidak boleh kosong');
                 isValid = false;
@@ -93,7 +93,7 @@ const RegisterModule = (() => {
                 showError(password, 'Password minimal 6 karakter');
                 isValid = false;
             }
-            
+
             if (confirmPassword.value.trim() === '') {
                 showError(confirmPassword, 'Konfirmasi password tidak boleh kosong');
                 isValid = false;
@@ -101,27 +101,24 @@ const RegisterModule = (() => {
                 showError(confirmPassword, 'Password tidak cocok');
                 isValid = false;
             }
-            
+
             if (isValid) {
                 console.log('Registrasi berhasil!');
                 console.log('Username:', username.value);
                 console.log('Email/Phone:', email.value);
-                
+
                 showSuccess(registerFormSubmit, 'Registrasi berhasil! Mengalihkan ke halaman login...');
-                
+
                 setTimeout(() => {
                     registerFormSubmit.reset();
-                    // Navigate ke login menggunakan router
-                    if (typeof router !== 'undefined') {
-                        router.navigateTo('login');
-                    }
+                    window.location.href = "../login/login.html";
                 }, 2000);
             }
         });
 
         // Real-time validation
         registerFormSubmit.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', function() {
+            input.addEventListener('input', function () {
                 if (this.classList.contains('error')) {
                     clearError(this);
                 }

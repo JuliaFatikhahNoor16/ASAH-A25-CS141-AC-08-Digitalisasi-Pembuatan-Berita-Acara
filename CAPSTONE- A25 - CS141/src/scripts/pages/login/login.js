@@ -18,12 +18,12 @@ const LoginModule = (() => {
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message show';
         errorDiv.textContent = message;
-        
+
         const existingError = input.parentElement.querySelector('.error-message');
         if (existingError) {
             existingError.remove();
         }
-        
+
         input.parentElement.appendChild(errorDiv);
     }
 
@@ -42,7 +42,7 @@ const LoginModule = (() => {
         successDiv.className = 'success-message show';
         successDiv.textContent = message;
         form.insertBefore(successDiv, form.firstChild);
-        
+
         setTimeout(() => {
             successDiv.remove();
         }, 3000);
@@ -51,28 +51,30 @@ const LoginModule = (() => {
     // Initialize login form
     function init() {
         const loginFormSubmit = document.getElementById('loginFormSubmit');
-        
+
         if (!loginFormSubmit) return;
 
         // Handle submit
-        loginFormSubmit.addEventListener('submit', function(e) {
+        loginFormSubmit.addEventListener('submit', function (e) {
             e.preventDefault();
-            
-            const user = document.getElementById('loginUser');
+
+            const role = document.getElementById('loginRole');       // DROPDOWN ROLE
             const email = document.getElementById('loginEmail');
             const password = document.getElementById('loginPassword');
-            
+
             let isValid = true;
-            
-            clearError(user);
+
+            clearError(role);
             clearError(email);
             clearError(password);
-            
-            if (user.value.trim() === '') {
-                showError(user, 'Username tidak boleh kosong');
+
+            // Validasi Role
+            if (role.value === '') {
+                showError(role, 'Silakan pilih role terlebih dahulu');
                 isValid = false;
             }
-            
+
+            // Validasi Email / Phone
             if (email.value.trim() === '') {
                 showError(email, 'Email/Phone tidak boleh kosong');
                 isValid = false;
@@ -80,7 +82,8 @@ const LoginModule = (() => {
                 showError(email, 'Format email atau nomor telepon tidak valid');
                 isValid = false;
             }
-            
+
+            // Validasi Password
             if (password.value.trim() === '') {
                 showError(password, 'Password tidak boleh kosong');
                 isValid = false;
@@ -88,24 +91,37 @@ const LoginModule = (() => {
                 showError(password, 'Password minimal 6 karakter');
                 isValid = false;
             }
-            
+
+            // Jika valid -> redirect
             if (isValid) {
                 console.log('Login berhasil!');
-                console.log('Username:', user.value);
+                console.log('Role:', role.value);
                 console.log('Email/Phone:', email.value);
-                
+
                 showSuccess(loginFormSubmit, 'Login berhasil! Mengalihkan...');
-                
+
                 setTimeout(() => {
                     loginFormSubmit.reset();
-                    alert('Login berhasil! Silakan implementasikan redirect ke dashboard.');
+
+                    if (role.value === "gudang") {
+                        window.location.href = "../pic-gudang/pic-gudang.html";
+                    }
+
+                    else if (role.value === "direksi") {
+                        window.location.href = "../direksi/direksi.html";
+                    }
+
+                    else if (role.value === "vendor") {
+                        window.location.href = "../vendor/vendor.html";
+                    }
+
                 }, 2000);
             }
         });
 
-        // Real-time validation
-        loginFormSubmit.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', function() {
+        // Real-time validation (input & select)
+        loginFormSubmit.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('input', function () {
                 if (this.classList.contains('error')) {
                     clearError(this);
                 }

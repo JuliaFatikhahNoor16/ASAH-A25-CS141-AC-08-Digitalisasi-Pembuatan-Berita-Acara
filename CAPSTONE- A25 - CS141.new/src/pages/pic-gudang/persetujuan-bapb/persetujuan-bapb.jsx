@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import Sidebar from '../../../components/common/sidebar';
-import Header from '../../../components/common/header';
-import { useAuth } from '../../../contexts/authcontext';
 import { ArrowLeft, FileText, Package, CheckCircle2, XCircle } from 'lucide-react';
 
 const PersetujuanBapb = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { userEmail, logout } = useAuth();
 
   const [dokumen, setDokumen] = useState(null);
   const [barangList, setBarangList] = useState([]);
@@ -26,20 +22,6 @@ const PersetujuanBapb = () => {
       navigate('/pic-gudang/persetujuan-bapb');
     }
   }, [location, navigate]);
-
-  const handleLogout = () => {
-    const confirm = window.confirm('Apakah Anda yakin ingin logout?');
-    if (confirm) {
-      logout();
-      navigate('/login');
-    }
-  };
-
-  const user = {
-    name: 'PIC Gudang',
-    role: 'gudang',
-    email: userEmail
-  };
 
   const handleKembaliKePengecekan = () => {
     navigate(`/pic-gudang/persetujuan-bapb/pengecekan/${id}`, {

@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText } from 'lucide-react';
-import BappOverviewCard from '../../components/direksi/bapp-overview-card';
+import { StatsGrid } from '../../components/common/statcard'; // TAMBAH IMPORT INI
 
 const PersetujuanBappList = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [bappData, setBappData] = useState({
         stats: {
-            totalDokumen: 0,
-            pending: 0
+            totalBapp: 0,
+            totalDitolak: 0,
+            totalDisetujui: 0,
+            rataWaktu: '0 hari'
         },
         list: []
     });
@@ -22,11 +24,13 @@ const PersetujuanBappList = () => {
         try {
             setLoading(true);
 
-            // Mock data
+            // Mock data - konsisten dengan dashboard
             const mockData = {
                 stats: {
-                    totalDokumen: 3,
-                    pending: 3
+                    totalBapp: 8,
+                    totalDitolak: 5,
+                    totalDisetujui: 25,
+                    rataWaktu: '2 hari'
                 },
                 list: [
                     {
@@ -87,23 +91,19 @@ const PersetujuanBappList = () => {
                 <p className="text-gray-500 mt-1">Daftar dokumen BAPP yang menunggu persetujuan</p>
             </div>
 
-            {/* Stats Cards - Only 2 cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <BappOverviewCard
-                    title="Total Dokumen"
-                    value={bappData.stats.totalDokumen}
-                    icon="📄"
-                    bgColor="bg-gradient-to-br from-blue-500 to-blue-600"
-                />
-                <BappOverviewCard
-                    title="Pending"
-                    value={bappData.stats.pending}
-                    icon="⏳"
-                    bgColor="bg-gradient-to-br from-yellow-400 to-yellow-500"
+            {/* Stats Cards - 4 cards konsisten dengan dashboard */}
+            <div className="mb-8">
+                <StatsGrid
+                    data={{
+                        bappMenunggu: bappData.stats.totalBapp,
+                        dokumenDitolak: bappData.stats.totalDitolak,
+                        dokumenDisetujui: bappData.stats.totalDisetujui,
+                        rataRataWaktu: bappData.stats.rataWaktu
+                    }}
                 />
             </div>
 
-            {/* BAPP List Table - Without Jumlah Barang column */}
+            {/* BAPP List Table */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="overflow-x-auto">
                     <table className="w-full">

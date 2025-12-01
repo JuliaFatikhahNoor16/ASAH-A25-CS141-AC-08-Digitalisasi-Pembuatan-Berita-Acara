@@ -8,8 +8,17 @@ import HomePage from './pages/home-page';
 import LoginPage from './pages/login-page';
 import RegisterPage from './pages/register-page';
 
-// Import Dashboard Pages (akan dibuat)
+// Import Layouts
+import DireksiLayout from './layouts/direksi-layouts';
+
+// Import Dashboard Pages - Direksi
 import DireksiDashboard from './pages/direksi/direksi-dashboard';
+import DokumenOverview from './pages/direksi/dokumen-overview';
+import DokumenOverviewDetail from './pages/direksi/dokumen-overview-detail';
+import PersetujuanBappList from './pages/direksi/persetujuan-bapp-list';
+import PersetujuanBappDetail from './pages/direksi/persetujuan-bapp-detail';
+import NotifikasiDireksi from './pages/direksi/notifikasi-direksi';
+
 import PicDashboard from './pages/pic-gudang/pic-dashboard';
 import VendorDashboard from './pages/vendor/vendor-dashboard';
 
@@ -75,15 +84,30 @@ function AppRoutes() {
         } 
       />
 
-      {/* Protected Routes - Direksi */}
+      {/* Protected Routes - Direksi dengan Layout */}
       <Route 
-        path="/direksi/dashboard" 
+        path="/direksi" 
         element={
           <ProtectedRoute requiredRole="direksi">
-            <DireksiDashboard />
+            <DireksiLayout />
           </ProtectedRoute>
-        } 
-      />
+        }
+      >
+        {/* Nested routes inside DireksiLayout */}
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<DireksiDashboard />} />
+        
+        {/* Persetujuan BAPP Routes */}
+        <Route path="persetujuan-bapp" element={<PersetujuanBappList />} />
+        <Route path="persetujuan-bapp/:id" element={<PersetujuanBappDetail />} />
+        
+        {/* Dokumen Overview (Approved/Rejected) */}
+        <Route path="project-overview" element={<DokumenOverview />} />
+        <Route path="project-overview/:id" element={<DokumenOverviewDetail />} />
+        
+        {/* Notifikasi */}
+        <Route path="notifikasi" element={<NotifikasiDireksi />} />
+      </Route>
       
       {/* Protected Routes - PIC Gudang */}
       <Route 

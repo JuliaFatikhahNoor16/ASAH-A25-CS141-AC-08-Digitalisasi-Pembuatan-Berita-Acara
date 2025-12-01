@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import StatCard from '../../components/common/statcard';
+import { StatsGrid } from '../../components/common/statcard'; // UBAH INI - tambahkan { StatsGrid }
 import BappPriorityTable from '../../components/direksi/bapp-priority-table';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,10 +21,10 @@ const DireksiDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Mock data - ganti dengan API call sebenarnya
       // const response = await documentService.getDireksiDashboard();
-      
+
       // Simulasi data untuk development
       const mockData = {
         bappMenunggu: 8,
@@ -110,34 +110,14 @@ const DireksiDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard
-          title="BAPP"
-          value={dashboardData.bappMenunggu}
-          subtitle="Menunggu persetujuan"
-          icon="📋"
-          color="blue"
-        />
-        <StatCard
-          title="Dokumen Ditolak"
-          value={dashboardData.dokumenDitolak}
-          subtitle="Total ditolak"
-          icon="❌"
-          color="red"
-        />
-        <StatCard
-          title="Dokumen Disetujui"
-          value={dashboardData.dokumenDisetujui}
-          subtitle="Total disetujui"
-          icon="✅"
-          color="green"
-        />
-        <StatCard
-          title="Rata-rata Waktu"
-          value={dashboardData.rataRataWaktu}
-          subtitle="Approval time"
-          icon="⏱️"
-          color="yellow"
+      <div className="mb-8">
+        <StatsGrid
+          data={{
+            bappMenunggu: dashboardData.bappMenunggu,
+            dokumenDitolak: dashboardData.dokumenDitolak,
+            dokumenDisetujui: dashboardData.dokumenDisetujui,
+            rataRataWaktu: dashboardData.rataRataWaktu
+          }}
         />
       </div>
 
@@ -146,7 +126,7 @@ const DireksiDashboard = () => {
         <h2 className="text-xl font-semibold text-gray-800 mb-6">
           BAPP Priority List
         </h2>
-        <BappPriorityTable 
+        <BappPriorityTable
           data={dashboardData.bappPriorityList}
           onReview={handleReview}
         />

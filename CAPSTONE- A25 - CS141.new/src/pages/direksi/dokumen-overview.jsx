@@ -15,56 +15,51 @@ const DokumenOverview = () => {
     try {
       setLoading(true);
       
-      // Mock data sesuai screenshot
+      // Mock data sesuai screenshot - hanya yang sudah disetujui atau ditolak
       const mockData = [
         {
           id: 1,
-          noBapp: 'BAPP-2024-064',
-          vendor: 'PT. Jaya Abadi',
-          items: '10 items',
-          nilai: 'Rp 50.000.000',
-          tanggalReview: '14 Nov 2024',
-          keterangan: 'Disetujui',
+          noBapp: 'BAPP-XYZ-234',
+          namaProyek: 'Renovasi Gedung Kantor Pusat',
+          deskripsi: 'Proyek renovasi gedung kantor pusat meliputi perbaikan struk...',
+          vendor: 'PT. Wijaya Konstruksi',
+          tanggalReview: '2025-01-15',
           status: 'approved'
         },
         {
           id: 2,
-          noBapp: 'BAPP-2024-063',
-          vendor: 'CV. Mandiri',
-          items: '7 items',
-          nilai: 'Rp 35.000.000',
-          tanggalReview: '13 Nov 2024',
-          keterangan: 'Disetujui',
+          noBapp: 'BAPP-ABC-567',
+          namaProyek: 'Pembangunan Gedung Baru Lantai 5',
+          deskripsi: 'Pembangunan gedung baru 5 lantai untuk ekspansi kantor denga...',
+          vendor: 'PT. Mega Bangunan',
+          tanggalReview: '2025-01-14',
           status: 'approved'
         },
         {
           id: 3,
-          noBapp: 'BAPP-2024-062',
-          vendor: 'PT. Bangun',
-          items: '9 items',
-          nilai: 'Rp 55.000.000',
-          tanggalReview: '12 Nov 2024',
-          keterangan: 'Ditolak',
+          noBapp: 'BAPP-XYZ-890',
+          namaProyek: 'Pengadaan Furniture Kantor',
+          deskripsi: 'Pengadaan furniture untuk seluruh kantor termasuk meja, kurs...',
+          vendor: 'PT. Furniture Indo',
+          tanggalReview: '2025-01-13',
           status: 'rejected'
         },
         {
           id: 4,
-          noBapp: 'BAPP-2024-061',
-          vendor: 'PT. Jaya Abadi',
-          items: '14 items',
-          nilai: 'Rp 70.000.000',
-          tanggalReview: '11 Nov 2024',
-          keterangan: 'Disetujui',
+          noBapp: 'BAPP-DEF-123',
+          namaProyek: 'Renovasi Ruang Meeting',
+          deskripsi: 'Renovasi dan upgrade ruang meeting lantai 3 dengan teknologi...',
+          vendor: 'PT. Interior Jaya',
+          tanggalReview: '2025-01-12',
           status: 'approved'
         },
         {
           id: 5,
-          noBapp: 'BAPP-2024-060',
-          vendor: 'Vendor Lain',
-          items: '6 items',
-          nilai: 'Rp 30.000.000',
-          tanggalReview: '10 Nov 2024',
-          keterangan: 'Ditolak',
+          noBapp: 'BAPP-GHI-456',
+          namaProyek: 'Pengadaan Server Baru',
+          deskripsi: 'Pengadaan server dan infrastruktur IT untuk kebutuhan kantor...',
+          vendor: 'PT. Tech Solution',
+          tanggalReview: '2025-01-11',
           status: 'rejected'
         }
       ];
@@ -80,13 +75,13 @@ const DokumenOverview = () => {
   const getStatusBadge = (status) => {
     if (status === 'approved') {
       return (
-        <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        <span className="inline-flex px-4 py-2 rounded-lg text-sm font-medium bg-green-100 text-green-800">
           Disetujui
         </span>
       );
     } else if (status === 'rejected') {
       return (
-        <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+        <span className="inline-flex px-4 py-2 rounded-lg text-sm font-medium bg-red-100 text-red-800">
           Ditolak
         </span>
       );
@@ -129,19 +124,16 @@ const DokumenOverview = () => {
                   No BAPP
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Nama Proyek
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Vendor
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Items
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Nilai
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Tanggal Review
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Keterangan
+                  Status
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Aksi
@@ -152,22 +144,17 @@ const DokumenOverview = () => {
               {dokumenData.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="text-sm font-semibold text-green-700">{item.noBapp}</div>
+                    <div className="text-sm font-semibold text-gray-900">{item.noBapp}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-semibold text-gray-900">{item.namaProyek}</div>
+                    <div className="text-sm text-gray-500 mt-1">{item.deskripsi}</div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900">{item.vendor}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-700">{item.items}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">{item.nilai}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-700 flex items-center gap-2">
-                      <span className="text-green-600">📅</span>
-                      {item.tanggalReview}
-                    </div>
+                    <div className="text-sm text-gray-900">{item.tanggalReview}</div>
                   </td>
                   <td className="px-6 py-4">
                     {getStatusBadge(item.status)}

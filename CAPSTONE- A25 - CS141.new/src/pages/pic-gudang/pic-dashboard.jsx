@@ -1,28 +1,10 @@
 import React from 'react';
-import Sidebar from '../../components/common/sidebar';
-import Header from '../../components/common/header';
 import { StatsGrid } from '../../components/common/statcard';
 import BapbTable from '../../components/pic-gudang/bapb-table';
-import { useAuth } from '../../contexts/authcontext';
 import { useNavigate } from 'react-router-dom';
 
 const PicDashboard = () => {
-  const { userEmail, logout } = useAuth();
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    const confirm = window.confirm('Apakah Anda yakin ingin logout?');
-    if (confirm) {
-      logout();
-      navigate('/login');
-    }
-  };
-
-  const user = {
-    name: 'PIC Gudang',
-    role: 'gudang',
-    email: userEmail
-  };
 
   // Data BAPB dengan struktur yang lengkap untuk pengecekan barang
   const bapbData = [
@@ -182,7 +164,7 @@ const PicDashboard = () => {
     }
   ];
 
-  // Custom handler jika perlu
+  // Custom handler jika perlu (opsional)
   const handleViewBapb = (dokumen) => {
     navigate(`/pic-gudang/persetujuan-bapb/pengecekan/${dokumen.noBapb}`, {
       state: { dokumen }
@@ -190,36 +172,22 @@ const PicDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Sidebar role="gudang" />
-      
-      <div className="ml-64">
-        <Header 
-          user={user}
-          onLogout={handleLogout}
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-500 mt-1">Overview Projek & Persetujuan</p>
+      </div>
+
+      <div className="mb-8">
+        <StatsGrid />
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">BAPB Priority List</h2>
+        <BapbTable
+          data={bapbData}
+          onView={handleViewBapb}
         />
-        
-        <main className="p-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-gray-500 mt-1">Overview Projek & Persetujuan</p>
-            </div>
-
-            <div className="mb-8">
-              <StatsGrid />
-            </div>
-
-            {/* Menggunakan Komponen BapbTable */}
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">BAPB Priority List</h2>
-              <BapbTable 
-                data={bapbData}
-                onView={handleViewBapb} 
-              />
-            </div>
-          </div>
-        </main>
       </div>
     </div>
   );

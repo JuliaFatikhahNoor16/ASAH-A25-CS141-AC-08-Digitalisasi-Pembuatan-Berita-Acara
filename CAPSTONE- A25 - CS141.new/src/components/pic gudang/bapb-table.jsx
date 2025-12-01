@@ -4,6 +4,14 @@ import { Package } from 'lucide-react';
 
 const BapbTable = ({ data = [], onView }) => {
   // Gunakan onView yang diberikan dari parent component
+
+  const getStatusColor = (status) => {
+    if (status === 'Disetujui') return 'bg-green-100 text-green-800'; // HIJAU untuk Disetujui
+    if (status === 'Ditolak') return 'bg-red-100 text-red-800';       // MERAH untuk Ditolak
+    if (status === 'Menunggu Persetujuan') return 'bg-yellow-100 text-yellow-800';
+    return 'bg-gray-100 text-gray-800';
+  };
+  
   const handleView = (dokumen) => {
     if (onView && typeof onView === 'function') {
       onView(dokumen);
@@ -65,7 +73,7 @@ const BapbTable = ({ data = [], onView }) => {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-2 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-medium">
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(dokumen.status)}`}>
                       {dokumen.status}
                     </span>
                   </td>

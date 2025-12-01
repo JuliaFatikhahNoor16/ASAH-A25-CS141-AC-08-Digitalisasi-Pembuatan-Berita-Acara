@@ -111,7 +111,7 @@ const DokumenOverview = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#1e3a8a]">Dokumen Overview</h1>
-        <p className="text-gray-500 mt-1">Lihat semua dokumen BAPB yang disetujui dan ditolak</p>
+        <p className="text-gray-500 mt-1">Lihat semua dokumen BAPP yang disetujui dan ditolak</p>
       </div>
 
       {/* Table */}
@@ -167,13 +167,6 @@ const DokumenOverview = () => {
                         title="View Detail"
                       >
                         <Eye size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDownload(item)}
-                        className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                        title="Download"
-                      >
-                        <Download size={18} />
                       </button>
                     </div>
                   </td>

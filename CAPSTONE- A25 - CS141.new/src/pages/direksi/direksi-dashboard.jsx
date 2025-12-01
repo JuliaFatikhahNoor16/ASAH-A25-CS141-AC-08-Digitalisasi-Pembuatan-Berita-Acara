@@ -8,8 +8,8 @@ const DireksiDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({
     bappMenunggu: 0,
-    totalProjekAktif: 0,
-    nilaiTotal: '',
+    dokumenDitolak: 0,
+    dokumenDisetujui: 0,
     rataRataWaktu: '',
     bappPriorityList: []
   });
@@ -27,58 +27,55 @@ const DireksiDashboard = () => {
       
       // Simulasi data untuk development
       const mockData = {
-        bappMenunggu: 5,
-        totalProjekAktif: 8,
-        nilaiTotal: 'Rp 2.5 M',
+        bappMenunggu: 8,
+        dokumenDitolak: 5,
+        dokumenDisetujui: 25,
         rataRataWaktu: '2 hari',
         bappPriorityList: [
           {
+            id: 1,
             noBapp: 'BAPP-XYZ-234',
-            projek: 'Renovasi Kantor Pusat',
-            nilai: 'Rp 500 M',
-            deadline: '11/11/2025'
+            namaProyek: 'Renovasi Gedung Kantor Pusat',
+            deskripsi: 'Proyek renovasi gedung kantor pusat meliputi perbaikan struktur bangunan, pengecatan ulang, dan sistem listrik',
+            vendor: 'PT. Wijaya Konstruksi',
+            tanggal: '2025-01-15',
+            status: 'Menunggu Persetujuan'
           },
           {
-            noBapp: 'BAPP-ABC-235',
-            projek: 'Infrastruktur IT',
-            nilai: 'Rp 200 M',
-            deadline: '12/11/2025'
+            id: 2,
+            noBapp: 'BAPP-ABC-567',
+            namaProyek: 'Pembangunan Gedung Baru Lantai 5',
+            deskripsi: 'Pembangunan gedung baru 5 lantai untuk ekspansi kantor dengan fasilitas lengkap',
+            vendor: 'PT. Mega Bangunan',
+            tanggal: '2025-01-14',
+            status: 'Menunggu Persetujuan'
           },
           {
-            noBapp: 'BAPP-XYZ-236',
-            projek: 'Program Pelatihan',
-            nilai: 'Rp 75 M',
-            deadline: '13/11/2025'
+            id: 3,
+            noBapp: 'BAPP-XYZ-890',
+            namaProyek: 'Pengadaan Furniture Kantor',
+            deskripsi: 'Pengadaan furniture untuk seluruh kantor termasuk meja, kursi, dan lemari',
+            vendor: 'PT. Furniture Indo',
+            tanggal: '2025-01-13',
+            status: 'Menunggu Persetujuan'
           },
           {
-            noBapp: 'BAPP-ABC-237',
-            projek: 'Ekspansi Cabang',
-            nilai: 'Rp 100 M',
-            deadline: '14/11/2025'
+            id: 4,
+            noBapp: 'BAPP-DEF-456',
+            namaProyek: 'Upgrade Sistem IT',
+            deskripsi: 'Upgrade sistem IT perusahaan termasuk server, network, dan software management',
+            vendor: 'PT. Tech Solutions',
+            tanggal: '2025-01-12',
+            status: 'Menunggu Persetujuan'
           },
           {
-            noBapp: 'BAPP-XYZ-238',
-            projek: 'Pengembangan Produk',
-            nilai: 'Rp 65 M',
-            deadline: '15/11/2025'
-          },
-          {
-            noBapp: 'BAPP-ABC-237',
-            projek: 'Ekspansi Cabang',
-            nilai: 'Rp 100 M',
-            deadline: '14/11/2025'
-          },
-          {
-            noBapp: 'BAPP-ABC-237',
-            projek: 'Ekspansi Cabang',
-            nilai: 'Rp 100 M',
-            deadline: '15/11/2025'
-          },
-          {
-            noBapp: 'BAPP-ABC-237',
-            projek: 'Ekspansi Cabang',
-            nilai: 'Rp 100 M',
-            deadline: '15/11/2025'
+            id: 5,
+            noBapp: 'BAPP-GHI-789',
+            namaProyek: 'Renovasi Gudang',
+            deskripsi: 'Renovasi gudang untuk meningkatkan kapasitas penyimpanan dan keamanan',
+            vendor: 'PT. Konstruksi Jaya',
+            tanggal: '2025-01-11',
+            status: 'Menunggu Persetujuan'
           }
         ]
       };
@@ -106,39 +103,43 @@ const DireksiDashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Overview Projek & Persetujuan */}
-      <section className="mb-8">
-        <div>
-              <h1 className="text-3xl font-bold text-[#1e3a8a]">Dashboard Direksi</h1>
-              <p className="text-gray-500 mt-1">Overview Projek & Persetujuan</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="BAPP Menunggu"
-            value={dashboardData.bappMenunggu}
-            icon="📋"
-            bgColor="bg-gradient-to-br from-blue-500 to-purple-600"
-          />
-          <StatCard
-            title="Total Projek Aktif"
-            value={dashboardData.totalProjekAktif}
-            icon="📊"
-            bgColor="bg-gradient-to-br from-pink-500 to-red-500"
-          />
-          <StatCard
-            title="Nilai Total Projek"
-            value={dashboardData.nilaiTotal}
-            icon="💰"
-            bgColor="bg-gradient-to-br from-green-400 to-cyan-500"
-          />
-          <StatCard
-            title="Rata-rata Waktu Approval"
-            value={dashboardData.rataRataWaktu}
-            icon="⏱️"
-            bgColor="bg-gradient-to-br from-yellow-400 to-orange-400"
-          />
-        </div>
-      </section>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-[#1e3a8a]">Dashboard Direksi</h1>
+        <p className="text-gray-500 mt-1">Overview Projek & Persetujuan</p>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard
+          title="BAPP"
+          value={dashboardData.bappMenunggu}
+          subtitle="Menunggu persetujuan"
+          icon="📋"
+          color="blue"
+        />
+        <StatCard
+          title="Dokumen Ditolak"
+          value={dashboardData.dokumenDitolak}
+          subtitle="Total ditolak"
+          icon="❌"
+          color="red"
+        />
+        <StatCard
+          title="Dokumen Disetujui"
+          value={dashboardData.dokumenDisetujui}
+          subtitle="Total disetujui"
+          icon="✅"
+          color="green"
+        />
+        <StatCard
+          title="Rata-rata Waktu"
+          value={dashboardData.rataRataWaktu}
+          subtitle="Approval time"
+          icon="⏱️"
+          color="yellow"
+        />
+      </div>
 
       {/* BAPP Priority List */}
       <section>

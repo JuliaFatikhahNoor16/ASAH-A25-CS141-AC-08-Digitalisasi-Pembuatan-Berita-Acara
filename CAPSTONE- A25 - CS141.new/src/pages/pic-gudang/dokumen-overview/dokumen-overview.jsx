@@ -153,7 +153,6 @@ const DokumenOverview = () => {
         <p className="text-gray-500 mt-1">Lihat semua dokumen BAPB yang disetujui dan ditolak</p>
       </div>
 
-      {/* Menggunakan komponen BapbTable yang sama */}
       <BapbTable
         data={modifiedData}
         onView={handleView}

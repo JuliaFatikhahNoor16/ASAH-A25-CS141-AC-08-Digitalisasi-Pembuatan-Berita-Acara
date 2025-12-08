@@ -72,15 +72,12 @@ const Header = ({ user, role, onLogout }) => {
           </div>
           
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="hidden md:block flex-1 max-w-md">
+          <form onSubmit={handleSearch} className="hidden md:block flex-1 max-w-lg">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari dokumen..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                style={{ paddingLeft: '2.75rem' }}
               />
             </div>
           </form>
@@ -212,3 +209,4 @@ const Header = ({ user, role, onLogout }) => {
 };
 
 export default Header;
+

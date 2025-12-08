@@ -1,84 +1,104 @@
-import React, { createContext, useContext, useState } from 'react';
+// src/contexts/NotificationContext.jsx
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { notificationAPI } from '../services/api-service';
 
 const NotificationContext = createContext();
 
 export const useNotification = () => {
   const context = useContext(NotificationContext);
   if (!context) {
-    throw new Error('useNotification must be used within a NotificationProvider');
+    throw new Error('useNotification must be used within NotificationProvider');
   }
   return context;
 };
 
 export const NotificationProvider = ({ children }) => {
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'approval',
-      title: 'BAPB-XYZ-234 membutuhkan persetujuan',
-      time: '2 jam yang lalu',
-      description: 'Dokumen dari PT. Jaya Abadi menunggu review',
-      read: false,
-      documentId: 'BAPB-XYZ-234',
-      actions: ['Review']
-    },
-    {
-      id: 2,
-      type: 'approved',
-      title: 'BAPP-ABC-235 telah disetujui',
-      time: '5 jam yang lalu',
-      description: 'Direksi telah menyetujui dokumen Anda',
-      read: false,
-      documentId: 'BAPP-ABC-235',
-      actions: ['Lihat Dokumen']
-    },
-    {
-      id: 3,
-      type: 'system',
-      title: 'Maintenance System',
-      time: '1 hari yang lalu',
-      description: 'Akan ada maintenance system pada 25 Okt 2024',
-      read: true,
-      actions: []
+  const [preferences, setPreferences] = useState({
+    barangMasuk: true,
+    dokumenDisetujui: true,
+    komentarBaru: true,
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchPreferences = async () => {
+    try {
+      setError(null);
+      const response = await notificationAPI.getPreferences();
+      setPreferences(response.data);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.warn('Error fetching notification preferences:', error.message);
+      setError('Tidak dapat mengambil preferensi, menggunakan default');
+      
+      // Tetap set default preferences meski error
+      const defaultPrefs = {
+        barangMasuk: true,
+        dokumenDisetujui: true,
+        komentarBaru: true,
+      };
+      setPreferences(defaultPrefs);
+      
+      return { success: false, error: error.message };
     }
-  ]);
-
-  const unreadCount = notifications.filter(n => !n.read).length;
-
-  const markAsRead = (id) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notif => ({ ...notif, read: true }))
-    );
+  const updatePreferences = async (newPreferences) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Update state dulu untuk UX yang lebih baik
+      setPreferences(newPreferences);
+      
+      // Simpan ke localStorage sebagai backup
+      localStorage.setItem('notificationPreferences', JSON.stringify(newPreferences));
+      
+      // Coba simpan ke backend
+      const response = await notificationAPI.updatePreferences(newPreferences);
+      
+      setLoading(false);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.warn('Error updating preferences:', error.message);
+      setError('Gagal menyimpan ke server, namun preferensi tersimpan lokal');
+      
+      // Tetap simpan di localStorage
+      localStorage.setItem('notificationPreferences', JSON.stringify(newPreferences));
+      
+      setLoading(false);
+      return { 
+        success: false, 
+        error: 'Preferensi disimpan lokal (server offline)',
+        data: newPreferences 
+      };
+    }
   };
 
-  const addNotification = (notification) => {
-    const newNotification = {
-      id: Date.now(),
-      read: false,
-      time: 'Baru saja',
-      ...notification
-    };
-    setNotifications(prev => [newNotification, ...prev]);
-  };
-
-  const value = {
-    notifications,
-    unreadCount,
-    markAsRead,
-    markAllAsRead,
-    addNotification
-  };
+  // Load preferences on mount
+  useEffect(() => {
+    // Coba load dari localStorage dulu
+    const saved = localStorage.getItem('notificationPreferences');
+    if (saved) {
+      try {
+        setPreferences(JSON.parse(saved));
+      } catch (e) {
+        console.error('Error parsing saved preferences:', e);
+      }
+    }
+    
+    // Kemudian coba fetch dari server
+    fetchPreferences();
+  }, []);
 
   return (
-    <NotificationContext.Provider value={value}>
+    <NotificationContext.Provider value={{
+      preferences,
+      loading,
+      error,
+      updatePreferences,
+      fetchPreferences
+    }}>
       {children}
     </NotificationContext.Provider>
   );

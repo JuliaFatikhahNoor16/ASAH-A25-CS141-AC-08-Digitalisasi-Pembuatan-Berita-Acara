@@ -1,11 +1,16 @@
 // layouts/vendor-layout.jsx
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import Sidebar from '../components/common/sidebar';
 import Header from '../components/common/header';
+import { useUser } from '../context/user-context'; 
 
 const VendorLayout = () => {
-  const mockUser = {
+  // Gunakan user dari UserContext jika ada, fallback ke mock
+  const { user: contextUser, loading } = useUser();
+  
+  // Gabungkan data: prioritaskan dari context, fallback ke mock
+  const user = contextUser || {
     name: 'PT. Vendor',
     role: 'vendor',
     avatar: null
@@ -13,6 +18,7 @@ const VendorLayout = () => {
 
   const handleLogout = () => {
     console.log('Logout clicked');
+    // Jika UserContext punya logout function, panggil di sini
   };
 
   return (
@@ -24,8 +30,8 @@ const VendorLayout = () => {
       <div className="flex-1 ml-64 flex flex-col">
         {/* Header - Sticky at top */}
         <Header 
-          user={mockUser}
-          role="vendor"
+          user={user}
+          role={user.role || 'vendor'}
           onLogout={handleLogout}
         />
         

@@ -1,0 +1,326 @@
+﻿const express = require('express');
+const router = express.Router();
+const pool = require('../db');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { verifyToken } = require('../middleware/auth');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+
+// POST /api/auth/login
+// POST /api/auth/login
+router.post('/login', async (req, res) => {
+  const { role, email, password } = req.body;
+
+  console.log('\n🔍 ========== LOGIN ATTEMPT START ==========');
+  console.log('📝 Request data:', { role, email, password: password ? '***' : 'empty' });
+
+  if (!role || !email || !password) {
+    return res.status(400).json({ 
+      message: 'role, email, dan password wajib diisi'
+    });
+  }
+
+  try {
+    let tableName = null;
+    let idColumn = null;
+    
+    if (role === 'vendor') {
+      tableName = 'vendor';
+      idColumn = 'id_vendor';
+    } else if (role === 'pic') {
+      tableName = 'pic';
+      idColumn = 'id_pic';
+    } else if (role === 'direksi') {
+      tableName = 'direksi';
+      idColumn = 'id_direksi';
+    }
+    
+    console.log('📊 Role mapping:', { role, tableName, idColumn });
+
+    if (!tableName) {
+      return res.status(400).json({ 
+        message: 'role tidak valid. Gunakan: vendor, pic, atau direksi'
+      });
+    }
+
+    // Query user
+    let rows = [];
+    try {
+      [rows] = await pool.query(
+        `SELECT 
+          ${idColumn} as id,
+          email,
+          nama_lengkap,
+          password
+         FROM ${tableName} 
+         WHERE email = ?`,
+        [email]
+      );
+      console.log(`✅ Query executed. Found ${rows.length} rows`);
+    } catch (queryErr) {
+      console.error('❌ Query error:', queryErr.message);
+      return res.status(500).json({ 
+        message: 'Error query database',
+        error: queryErr.message 
+      });
+    }
+
+    if (!rows || rows.length === 0) {
+      console.log('❌ User not found with email:', email);
+      return res.status(401).json({ 
+        message: 'Email atau password salah'
+      });
+    }
+
+    const user = rows[0];
+    console.log('👤 User found:', {
+      id: user.id,
+      email: user.email,
+      nama_lengkap: user.nama_lengkap
+    });
+
+    // Compare password
+    const match = await bcrypt.compare(password, user.password);
+    console.log(`✅ bcrypt.compare result: ${match ? 'MATCH' : 'NO MATCH'}`);
+
+    if (!match) {
+      console.log('❌ Password tidak cocok');
+      return res.status(401).json({ 
+        message: 'Email atau password salah'
+      });
+    }
+
+    console.log('✅ Password validation SUCCESS');
+
+    // Generate JWT token
+    const userPayload = {
+      id: user.id,
+      role: role,
+      email: user.email,
+      nama_lengkap: user.nama_lengkap || 'User'
+    };
+
+    console.log('📦 User payload untuk JWT:', userPayload);
+
+    const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '8h' });
+
+    console.log('✅ Login SUCCESSFUL');
+    console.log('🔚 ========== LOGIN ATTEMPT END ==========\n');
+
+    // HANYA SATU RESPONSE - jangan ada return/res.json lagi setelah ini
+    res.json({
+      message: 'Login berhasil',
+      token,
+      user: userPayload
+    });
+
+  } catch (err) {
+    console.error('\n💥 UNEXPECTED ERROR:', err.message);
+    // JANGAN kirim response jika sudah dikirim
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        message: 'Server error',
+        error: err.message
+      });
+    }
+  }
+});
+
+// REGISTER KHUSUS VENDOR - TANPA AUTO LOGIN
+router.post('/register/vendor', async (req, res) => {
+  const { 
+    nama_lengkap, 
+    email, 
+    password, 
+    perusahaan, 
+    no_telepon, 
+    alamat 
+  } = req.body;
+
+  console.log('\n📝 ========== VENDOR REGISTRATION ==========');
+  console.log('📋 Registration data:', { 
+    nama_lengkap, 
+    email, 
+    perusahaan: perusahaan || '(tidak diisi)',
+    no_telepon: no_telepon ? '***' : 'empty',
+    alamat: alamat ? '***' : 'empty'
+  });
+
+  // Validasi
+  if (!nama_lengkap || !email || !password) {
+    return res.status(400).json({ 
+      message: 'Nama lengkap, email, dan password wajib diisi' 
+    });
+  }
+
+  try {
+    // Cek apakah email sudah terdaftar
+    const [existing] = await pool.query(
+      'SELECT id_vendor FROM vendor WHERE email = ?',
+      [email]
+    );
+
+    if (existing.length > 0) {
+      console.log('❌ Email already registered:', email);
+      return res.status(400).json({ 
+        message: 'Email sudah terdaftar' 
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log('🔐 Password hashed');
+
+    // Insert ke database
+    const [result] = await pool.query(
+      `INSERT INTO vendor (
+        nama_lengkap, 
+        email, 
+        password, 
+        nama_perusahaan,
+        alamat, 
+        no_telepon, 
+        jabatan,
+        created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
+      [
+        nama_lengkap, 
+        email, 
+        hashedPassword, 
+        perusahaan || null, 
+        alamat || '- belum diisi -',
+        no_telepon || null, 
+        'Vendor'
+      ]
+    );
+
+    const vendorId = result.insertId;
+    console.log('✅ Vendor registered with ID:', vendorId);
+
+    console.log('✅ Registration SUCCESSFUL (NO AUTO LOGIN)');
+    console.log('🔚 ========== REGISTRATION END ==========\n');
+
+    // RESPONSE TANPA TOKEN - hanya konfirmasi sukses
+    res.status(201).json({
+      message: 'Registrasi vendor berhasil. Silakan login dengan email dan password Anda.',
+      userId: vendorId,
+      email: email,
+      note: 'Silakan login ke sistem dengan kredensial yang telah didaftarkan'
+    });
+
+  } catch (err) {
+    console.error('❌ Registration error:', err);
+    console.error('❌ SQL Error details:', {
+      code: err.code,
+      errno: err.errno,
+      sqlMessage: err.sqlMessage,
+      sqlState: err.sqlState
+    });
+    
+    let errorMessage = 'Server error';
+    if (err.code === 'ER_NO_SUCH_TABLE') {
+      errorMessage = 'Tabel vendor tidak ditemukan di database';
+    } else if (err.code === 'ER_BAD_FIELD_ERROR') {
+      errorMessage = `Kolom tidak ditemukan: ${err.sqlMessage}`;
+    } else if (err.code === 'ER_BAD_NULL_ERROR') {
+      errorMessage = `Kolom wajib tidak diisi: ${err.sqlMessage}`;
+    } else if (err.code === 'ER_NO_DEFAULT_FOR_FIELD') {
+      errorMessage = `Kolom '${err.sqlMessage.match(/Field '(.+)' doesn't/)?.[1] || 'unknown'}' tidak memiliki nilai default`;
+    }
+    
+    res.status(500).json({ 
+      message: errorMessage, 
+      error: err.message,
+      sqlError: err.sqlMessage
+    });
+  }
+});
+
+// POST /api/auth/change-password
+router.post('/change-password', verifyToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const { id, role } = req.user;
+
+  console.log('\n🔑 ========== CHANGE PASSWORD ==========');
+  console.log('📝 Request from user:', { id, role });
+
+  if (!currentPassword || !newPassword) {
+    console.log('❌ Missing password fields');
+    return res.status(400).json({ 
+      message: 'currentPassword dan newPassword wajib diisi' 
+    });
+  }
+
+  try {
+    let tableName = null;
+    let idColumn = null;
+    
+    if (role === 'vendor') {
+      tableName = 'vendor';
+      idColumn = 'id_vendor';
+    } else if (role === 'pic') {
+      tableName = 'pic';
+      idColumn = 'id_pic';
+    } else {
+      tableName = 'direksi';
+      idColumn = 'id_direksi';
+    }
+
+    console.log(`🔍 Querying ${tableName} table for user id: ${id}`);
+    
+    const [rows] = await pool.query(
+      `SELECT password FROM ${tableName} WHERE ${idColumn} = ?`,
+      [id]
+    );
+
+    if (!rows || rows.length === 0) {
+      console.log('❌ User not found');
+      return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    const currentPasswordHash = rows[0].password;
+    const match = await bcrypt.compare(currentPassword, currentPasswordHash);
+    
+    if (!match) {
+      console.log('❌ Current password incorrect');
+      return res.status(400).json({ message: 'Password saat ini salah' });
+    }
+
+    console.log('✅ Current password verified');
+    
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    await pool.query(
+      `UPDATE ${tableName} SET password = ?, updated_at = NOW() WHERE ${idColumn} = ?`,
+      [hashedPassword, id]
+    );
+
+    console.log('✅ Password changed successfully');
+    console.log('🔚 ========== CHANGE PASSWORD END ==========\n');
+
+    res.json({ 
+      message: 'Password berhasil diubah'
+    });
+    
+  } catch (err) {
+    console.error('❌ Change password error:', err);
+    res.status(500).json({ 
+      message: 'Server error', 
+      error: err.message 
+    });
+  }
+});
+
+// GET /api/auth/verify (untuk testing token)
+router.get('/verify', verifyToken, (req, res) => {
+  console.log('\n✅ Token verification successful');
+  console.log('👤 User from token:', req.user);
+  
+  res.json({
+    message: 'Token valid',
+    user: req.user
+  });
+});
+
+module.exports = router;

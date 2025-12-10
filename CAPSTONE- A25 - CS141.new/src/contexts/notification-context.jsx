@@ -1,6 +1,5 @@
 // src/contexts/NotificationContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { notificationAPI } from '../services/api-service';
 
 const NotificationContext = createContext();
 

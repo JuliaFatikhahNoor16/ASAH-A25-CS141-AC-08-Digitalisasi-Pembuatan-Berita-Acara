@@ -1,17 +1,23 @@
-// components/common/header.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Bell, LogOut, User, Settings } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // Tambahkan ini
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Bell, Settings, User, LogOut, Search } from 'lucide-react';
+import { useAuth } from '../../contexts/authcontext';
 
-const Header = ({ user, role, onLogout }) => {
+const Header = ({ user: propUser, role: propRole, onLogout }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user: contextUser, logout: contextLogout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
-  const navigate = useNavigate(); // Tambahkan hook navigate
-
+  
+  // Use prop user/role if provided, otherwise use context
+  const user = propUser || contextUser;
+  const logout = onLogout || contextLogout;
+  
   // Mock notifications data
   const notifications = [
     { id: 1, message: 'Dokumen BAPB-XYZ-234 telah disetujui', time: '5 menit yang lalu', unread: true },
@@ -20,7 +26,7 @@ const Header = ({ user, role, onLogout }) => {
   ];
 
   const unreadCount = notifications.filter(n => n.unread).length;
-
+  
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -28,37 +34,71 @@ const Header = ({ user, role, onLogout }) => {
         setShowNotifications(false);
       }
       if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setShowProfileMenu(false);
+        setShowUserMenu(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+  
+  // Determine base path based on user role
+  const getBasePath = () => {
+    if (!user) return '/';
+    
+    const role = propRole || user.role;
+    switch (role) {
+      case 'direksi':
+        return '/direksi';
+      case 'gudang':
+      case 'pic':
+        return '/pic-gudang';
+      case 'vendor':
+        return '/vendor';
+      default:
+        return '/';
+    }
+  };
 
+  const basePath = getBasePath();
+  
+  const getRoleName = () => {
+    const role = propRole || user?.role;
+    if (role === 'vendor') return 'Dashboard Vendor';
+    if (role === 'direksi') return 'Dashboard Direksi';
+    if (role === 'pic' || role === 'gudang') return 'Dashboard PIC Gudang';
+    return 'Dashboard';
+  };
+  
   const handleSearch = (e) => {
     e.preventDefault();
     console.log('Search:', searchQuery);
-    // Implement search logic here
+  };
+  
+  // Get notification path based on role
+  const getNotificationPath = () => {
+    const role = propRole || user?.role;
+    if (role === 'gudang' || role === 'pic') return `${basePath}/notifikasi-pic`;
+    return `${basePath}/notifikasi`;
   };
 
-  const getRoleName = () => {
-    if (role === 'vendor') return 'Dashboard Vendor';
-    if (role === 'direksi') return 'Dashboard Direksi';
-    if (role === 'pic') return 'Dashboard PIC Gudang';
-    return 'Dashboard';
+  const handleLogout = () => {
+    setShowUserMenu(false);
+    if (logout) {
+      logout();
+    }
+    navigate('/login');
   };
 
-  // Fungsi untuk navigasi ke settings
-  const handleSettingsClick = () => {
-    setShowProfileMenu(false); // Tutup dropdown
-    navigate('/pengaturan'); // Navigasi ke halaman settings
-  };
-
-  // Fungsi untuk navigasi ke profile
-  const handleProfileClick = () => {
-    setShowProfileMenu(false); // Tutup dropdown
-    navigate('/profile'); // Navigasi ke halaman profile (jika ada)
+  const getRoleDisplayName = (role) => {
+    const roleNames = {
+      'vendor': 'Vendor',
+      'gudang': 'PIC Gudang',
+      'pic': 'PIC Gudang',
+      'direksi': 'Direksi',
+      'admin': 'Administrator'
+    };
+    return roleNames[role] || role;
   };
 
   return (
@@ -76,8 +116,10 @@ const Header = ({ user, role, onLogout }) => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <input
-                className="w-full pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                style={{ paddingLeft: '2.75rem' }}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </form>
@@ -90,6 +132,7 @@ const Header = ({ user, role, onLogout }) => {
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Notifikasi"
             >
               <Bell size={20} />
               {unreadCount > 0 && (
@@ -101,62 +144,69 @@ const Header = ({ user, role, onLogout }) => {
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                {/* Header */}
-                <div className="px-4 py-3 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900">Notifikasi</h3>
-                    {unreadCount > 0 && (
-                      <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-medium">
-                        {unreadCount} baru
-                      </span>
+              <>
+                <div 
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowNotifications(false)}
+                />
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                  {/* Header */}
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-gray-900">Notifikasi</h3>
+                      {unreadCount > 0 && (
+                        <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-medium">
+                          {unreadCount} baru
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Notification List */}
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      notifications.map((notif) => (
+                        <div
+                          key={notif.id}
+                          className={`px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors ${
+                            notif.unread ? 'bg-blue-50' : ''
+                          }`}
+                        >
+                          <p className="text-sm text-gray-900">{notif.message}</p>
+                          <p className="text-xs text-gray-500 mt-1">{notif.time}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-4 py-8 text-center text-gray-500">
+                        <Bell size={32} className="mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">Tidak ada notifikasi</p>
+                      </div>
                     )}
                   </div>
-                </div>
 
-                {/* Notification List */}
-                <div className="max-h-96 overflow-y-auto">
-                  {notifications.length > 0 ? (
-                    notifications.map((notif) => (
-                      <div
-                        key={notif.id}
-                        className={`px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors ${
-                          notif.unread ? 'bg-blue-50' : ''
-                        }`}
-                      >
-                        <p className="text-sm text-gray-900">{notif.message}</p>
-                        <p className="text-xs text-gray-500 mt-1">{notif.time}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="px-4 py-8 text-center text-gray-500">
-                      <Bell size={32} className="mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">Tidak ada notifikasi</p>
-                    </div>
-                  )}
+                  {/* Footer */}
+                  <div className="px-4 py-3 border-t border-gray-200">
+                    <button
+                      onClick={() => {
+                        setShowNotifications(false);
+                        navigate(getNotificationPath());
+                      }}
+                      className="w-full text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      Lihat Semua Notifikasi
+                    </button>
+                  </div>
                 </div>
-
-                {/* Footer */}
-                <div className="px-4 py-3 border-t border-gray-200">
-                  <button
-                    onClick={() => {
-                      setShowNotifications(false);
-                      navigate('/notifikasi'); // Navigasi ke halaman notifikasi
-                    }}
-                    className="w-full text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    Lihat Semua Notifikasi
-                  </button>
-                </div>
-              </div>
+              </>
             )}
           </div>
 
           {/* User Profile Menu */}
           <div className="relative" ref={profileRef}>
             <button
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              onClick={() => setShowUserMenu(!showUserMenu)}
               className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity"
+              title="Profile Menu"
             >
               <span className="text-white text-sm font-bold">
                 {user?.name?.charAt(0) || 'U'}
@@ -164,42 +214,50 @@ const Header = ({ user, role, onLogout }) => {
             </button>
 
             {/* Profile Dropdown */}
-            {showProfileMenu && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                <div className="px-4 py-3 border-b border-gray-200">
-                  <p className="text-sm font-semibold text-gray-900">{user?.name || 'User'}</p>
-                  <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
+            {showUserMenu && (
+              <>
+                {/* Backdrop */}
+                <div 
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowUserMenu(false)}
+                />
+                
+                {/* Menu */}
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <p className="text-sm font-semibold text-gray-900">{user?.name || 'User'}</p>
+                    <p className="text-xs text-gray-500 mt-1">{user?.email || 'user@example.com'}</p>
+                    <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                      {getRoleDisplayName(propRole || user?.role)}
+                    </span>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        navigate('/pengaturan');
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                    >
+                      <Settings size={16} />
+                      Pengaturan
+                    </button>
+                  </div>
+
+                  {/* Logout */}
+                  <div className="border-t border-gray-200 pt-2">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  </div>
                 </div>
-
-                <button 
-                  onClick={handleProfileClick}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
-                >
-                  <User size={16} />
-                  Profile
-                </button>
-
-                <button 
-                  onClick={handleSettingsClick}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
-                >
-                  <Settings size={16} />
-                  Pengaturan
-                </button>
-
-                <hr className="my-2" />
-
-                <button
-                  onClick={() => {
-                    setShowProfileMenu(false);
-                    onLogout();
-                  }}
-                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
-                >
-                  <LogOut size={16} />
-                  Logout
-                </button>
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -209,4 +267,3 @@ const Header = ({ user, role, onLogout }) => {
 };
 
 export default Header;
-

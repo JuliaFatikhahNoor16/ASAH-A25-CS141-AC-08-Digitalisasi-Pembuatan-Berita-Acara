@@ -1,6 +1,6 @@
 // src/components/settings/DisplaySetting.jsx
 import React, { useState, useEffect } from 'react';
-import { useDisplay } from '../../context/display-context';
+import { useDisplay } from '../../contexts/display-context';
 
 const DisplaySetting = () => {
   const { preferences, loading, updatePreferences, resetToDefault } = useDisplay();
@@ -256,36 +256,6 @@ const DisplaySetting = () => {
                 }`}
               />
             </button>
-          </div>
-        </div>
-
-        {/* Preview Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-            Pratinjau
-          </h3>
-          <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                <span className="text-blue-600 dark:text-blue-300">📱</span>
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-800 dark:text-white">
-                  Contoh Konten
-                </h4>
-                <p className="text-gray-600 dark:text-gray-300 mt-1">
-                  Ini adalah contoh bagaimana teks akan tampil dengan pengaturan yang Anda pilih.
-                </p>
-                <div className="flex gap-2 mt-3">
-                  <button className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm">
-                    Tombol Contoh
-                  </button>
-                  <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm">
-                    Tombol Sekunder
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 

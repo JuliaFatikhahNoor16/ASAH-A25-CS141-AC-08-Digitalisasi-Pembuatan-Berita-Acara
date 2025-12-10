@@ -1,50 +1,73 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Building, Phone, Briefcase, Save, Edit3, X, AlertCircle, CheckCircle } from 'lucide-react';
-import apiService from '../../services/api-service';
-import { mockProfile } from '../../services/mock-data';
+import { useAuth } from '../../contexts/authcontext';
 
 const ProfileSetting = () => {
-  const [profile, setProfile] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const authContext = useAuth();
+  const user = authContext?.user;
+  
+  const [isEditing, setIsEditing] = useState(true); // Always in edit mode
   const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    phone: '+62 812-3456-7890',
+    company: 'PT Example Indonesia',
+    position: 'Manager',
+    role: 'pic'
+  });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState({ type: '', text: '' });
 
+  // Load data dari auth context atau localStorage
   useEffect(() => {
-    loadProfile();
-  }, []);
-
-  const loadProfile = async () => {
-    try {
-      setIsLoading(true);
-      const data = await apiService.getProfile();
-      setProfile(data);
-      setFormData(data);
-    } catch (error) {
-      console.error('Failed to load profile:', error);
-      // Fallback to mock data for development
-      setProfile(mockProfile);
-      setFormData(mockProfile);
-      setMessage({
-        type: 'warning',
-        text: 'Menggunakan data demo. Pastikan backend terhubung untuk data real.'
-      });
-    } finally {
-      setIsLoading(false);
+    console.log('🔍 ProfileSetting mounted');
+    console.log('Auth Context:', authContext);
+    console.log('User:', user);
+    
+    // Priority 1: Cek localStorage dulu
+    const savedProfile = localStorage.getItem('userProfile');
+    if (savedProfile) {
+      try {
+        const parsed = JSON.parse(savedProfile);
+        console.log('✅ Loaded from localStorage:', parsed);
+        setFormData(parsed);
+        return;
+      } catch (e) {
+        console.error('❌ Error parsing localStorage:', e);
+      }
     }
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-    setErrors({});
-    setMessage({ type: '', text: '' });
-  };
+    
+    // Priority 2: Cek user dari context
+    if (user && user.name) {
+      const profileData = {
+        name: user.name,
+        email: user.email || '',
+        phone: user.phone || '',
+        company: user.company || '',
+        position: user.position || '',
+        role: user.role || 'pic'
+      };
+      console.log('✅ Loaded from context:', profileData);
+      setFormData(profileData);
+      localStorage.setItem('userProfile', JSON.stringify(profileData));
+      return;
+    }
+    
+    // Priority 3: Use default data (already set in useState)
+    console.log('ℹ️ Using default data');
+  }, [user, authContext]);
 
   const handleCancel = () => {
-    setIsEditing(false);
-    setFormData(profile);
+    // Reset form to original data
+    const savedProfile = localStorage.getItem('userProfile');
+    if (savedProfile) {
+      try {
+        setFormData(JSON.parse(savedProfile));
+      } catch (e) {
+        // If error, keep current formData
+      }
+    }
     setErrors({});
     setMessage({ type: '', text: '' });
   };
@@ -91,19 +114,13 @@ const ProfileSetting = () => {
     try {
       setIsSaving(true);
       
-      // Prepare data for API
-      const updateData = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        company: formData.company,
-        position: formData.position
-      };
-
-      const updatedProfile = await apiService.updateProfile(updateData);
+      // Simulasi API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      setProfile(updatedProfile);
-      setIsEditing(false);
+      // Simpan ke localStorage
+      localStorage.setItem('userProfile', JSON.stringify(formData));
+      
+      setIsEditing(true); // Stay in edit mode
       setMessage({
         type: 'success',
         text: 'Profil berhasil diperbarui!'
@@ -115,7 +132,7 @@ const ProfileSetting = () => {
       console.error('Error updating profile:', error);
       setMessage({
         type: 'error',
-        text: 'Gagal memperbarui profil: ' + error.message
+        text: 'Gagal memperbarui profil. Silakan coba lagi.'
       });
     } finally {
       setIsSaving(false);
@@ -125,6 +142,7 @@ const ProfileSetting = () => {
   const getRoleDisplayName = (role) => {
     const roleNames = {
       'vendor': 'Vendor',
+      'gudang': 'PIC Gudang',
       'pic': 'PIC Gudang',
       'direksi': 'Direksi',
       'admin': 'Administrator'
@@ -133,6 +151,7 @@ const ProfileSetting = () => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return '-';
     try {
       return new Date(dateString).toLocaleDateString('id-ID', {
         year: 'numeric',
@@ -140,51 +159,26 @@ const ProfileSetting = () => {
         day: 'numeric'
       });
     } catch (error) {
-      return 'Tanggal tidak valid';
+      return '-';
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="max-w-4xl mx-auto">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-12 bg-gray-200 rounded"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <AlertCircle className="mx-auto text-red-500 mb-4" size={48} />
-          <h3 className="text-lg font-semibold text-red-800 mb-2">
-            Gagal Memuat Data Profil
-          </h3>
-          <button
-            onClick={loadProfile}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Coba Lagi
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto p-6">
+      {/* Debug Info - Remove in production */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mb-4 p-3 bg-gray-100 rounded text-xs">
+          <strong>Debug:</strong> User exists: {user ? 'Yes' : 'No'} | 
+          Name: {formData.name} | 
+          Email: {formData.email}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Informasi Profil</h2>
-          <p className="text-gray-600 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Informasi Profil</h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
             Kelola informasi profil dan data pribadi Anda
           </p>
         </div>
@@ -211,8 +205,6 @@ const ProfileSetting = () => {
         }`}>
           {message.type === 'success' ? (
             <CheckCircle size={20} />
-          ) : message.type === 'error' ? (
-            <AlertCircle size={20} />
           ) : (
             <AlertCircle size={20} />
           )}
@@ -220,25 +212,27 @@ const ProfileSetting = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         {/* Profile Header */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-8 border-b border-gray-200">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 px-6 py-8 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-6">
             <div className="relative">
               <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                {profile?.name?.charAt(0) || 'U'}
+                {formData.name?.charAt(0).toUpperCase() || 'U'}
               </div>
             </div>
             
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">{profile.name}</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {formData.name}
+              </h3>
               <div className="flex items-center gap-4 mt-2">
-                <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-sm font-medium">
                   <User size={14} />
-                  {getRoleDisplayName(profile.role)}
+                  {getRoleDisplayName(formData.role)}
                 </span>
-                <span className="text-gray-600 text-sm">
-                  Bergabung sejak {formatDate(profile.createdAt)}
+                <span className="text-gray-600 dark:text-gray-400 text-sm">
+                  Bergabung sejak {formatDate(new Date().toISOString())}
                 </span>
               </div>
             </div>
@@ -250,7 +244,7 @@ const ProfileSetting = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Nama Lengkap */}
             <div className="md:col-span-2">
-              <label htmlFor="name" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <User size={16} />
                 Nama Lengkap
               </label>
@@ -258,26 +252,29 @@ const ProfileSetting = () => {
                 type="text"
                 id="name"
                 name="name"
-                value={formData.name || ''}
+                value={formData.name}
                 onChange={handleChange}
                 disabled={!isEditing}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
                   errors.name 
                     ? 'border-red-300 bg-red-50' 
                     : isEditing 
-                    ? 'border-gray-300 bg-white' 
-                    : 'border-gray-200 bg-gray-50'
+                    ? 'border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white' 
+                    : 'border-gray-200 bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300'
                 }`}
                 placeholder="Masukkan nama lengkap"
               />
               {errors.name && (
-                <p className="text-red-600 text-sm mt-1">{errors.name}</p>
+                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle size={14} />
+                  {errors.name}
+                </p>
               )}
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Mail size={16} />
                 Alamat Email
               </label>
@@ -285,26 +282,29 @@ const ProfileSetting = () => {
                 type="email"
                 id="email"
                 name="email"
-                value={formData.email || ''}
+                value={formData.email}
                 onChange={handleChange}
                 disabled={!isEditing}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
                   errors.email 
                     ? 'border-red-300 bg-red-50' 
                     : isEditing 
-                    ? 'border-gray-300 bg-white' 
-                    : 'border-gray-200 bg-gray-50'
+                    ? 'border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white' 
+                    : 'border-gray-200 bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300'
                 }`}
                 placeholder="nama@perusahaan.com"
               />
               {errors.email && (
-                <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle size={14} />
+                  {errors.email}
+                </p>
               )}
             </div>
 
             {/* Nomor Telepon */}
             <div>
-              <label htmlFor="phone" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="phone" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Phone size={16} />
                 Nomor Telepon
               </label>
@@ -312,37 +312,35 @@ const ProfileSetting = () => {
                 type="tel"
                 id="phone"
                 name="phone"
-                value={formData.phone || ''}
+                value={formData.phone}
                 onChange={handleChange}
                 disabled={!isEditing}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:bg-gray-50 disabled:border-gray-200"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:bg-gray-50 disabled:border-gray-200 dark:bg-gray-700 dark:text-white dark:disabled:bg-gray-900"
                 placeholder="+62 812-3456-7890"
               />
             </div>
 
             {/* Perusahaan */}
-            {(profile.role === 'vendor' || profile.role === 'pic') && (
-              <div>
-                <label htmlFor="company" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <Building size={16} />
-                  Perusahaan
-                </label>
-                <input
-                  type="text"
-                  id="company"
-                  name="company"
-                  value={formData.company || ''}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:bg-gray-50 disabled:border-gray-200"
-                  placeholder="Nama perusahaan"
-                />
-              </div>
-            )}
+            <div>
+              <label htmlFor="company" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Building size={16} />
+                Perusahaan
+              </label>
+              <input
+                type="text"
+                id="company"
+                name="company"
+                value={formData.company}
+                onChange={handleChange}
+                disabled={!isEditing}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:bg-gray-50 disabled:border-gray-200 dark:bg-gray-700 dark:text-white dark:disabled:bg-gray-900"
+                placeholder="Nama perusahaan"
+              />
+            </div>
 
             {/* Posisi/Jabatan */}
             <div>
-              <label htmlFor="position" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="position" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Briefcase size={16} />
                 Posisi/Jabatan
               </label>
@@ -350,29 +348,29 @@ const ProfileSetting = () => {
                 type="text"
                 id="position"
                 name="position"
-                value={formData.position || ''}
+                value={formData.position}
                 onChange={handleChange}
                 disabled={!isEditing}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:bg-gray-50 disabled:border-gray-200"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:bg-gray-50 disabled:border-gray-200 dark:bg-gray-700 dark:text-white dark:disabled:bg-gray-900"
                 placeholder="Posisi di perusahaan"
               />
             </div>
 
             {/* Role (Read-only) */}
             <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <User size={16} />
                 Role
               </label>
-              <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700">
-                {getRoleDisplayName(profile.role)}
+              <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300">
+                {getRoleDisplayName(formData.role)}
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
           {isEditing && (
-            <div className="flex gap-3 pt-6 mt-6 border-t border-gray-200">
+            <div className="flex gap-3 pt-6 mt-6 border-t border-gray-200 dark:border-gray-700">
               <button
                 type="submit"
                 disabled={isSaving}
@@ -386,7 +384,7 @@ const ProfileSetting = () => {
                 type="button"
                 onClick={handleCancel}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium disabled:opacity-50"
               >
                 <X size={18} />
                 Batal
@@ -398,8 +396,8 @@ const ProfileSetting = () => {
 
       {/* Last Updated Info */}
       <div className="mt-4 text-center">
-        <p className="text-gray-500 text-sm">
-          Terakhir diperbarui: {formatDate(profile.updatedAt)}
+        <p className="text-gray-500 dark:text-gray-400 text-sm">
+          Terakhir diperbarui: {formatDate(new Date().toISOString())}
         </p>
       </div>
     </div>

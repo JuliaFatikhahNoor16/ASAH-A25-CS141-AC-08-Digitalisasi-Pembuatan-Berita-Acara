@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Building, Phone, Briefcase, Save, Edit3, X, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/authcontext';
+import SignatureUpload from './signature-upload';
 
 const ProfileSetting = () => {
   const authContext = useAuth();
   const user = authContext?.user;
-  
+
   const [isEditing, setIsEditing] = useState(true); // Always in edit mode
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const ProfileSetting = () => {
     console.log('🔍 ProfileSetting mounted');
     console.log('Auth Context:', authContext);
     console.log('User:', user);
-    
+
     // Priority 1: Cek localStorage dulu
     const savedProfile = localStorage.getItem('userProfile');
     if (savedProfile) {
@@ -37,7 +38,7 @@ const ProfileSetting = () => {
         console.error('❌ Error parsing localStorage:', e);
       }
     }
-    
+
     // Priority 2: Cek user dari context
     if (user && user.name) {
       const profileData = {
@@ -53,10 +54,22 @@ const ProfileSetting = () => {
       localStorage.setItem('userProfile', JSON.stringify(profileData));
       return;
     }
-    
+
     // Priority 3: Use default data (already set in useState)
     console.log('ℹ️ Using default data');
   }, [user, authContext]);
+
+
+  const handleSignatureUpdate = (signature) => {
+    setFormData(prev => ({
+      ...prev,
+      signature: signature
+    }));
+
+    const savedProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+    savedProfile.signature = signature;
+    localStorage.setItem('userProfile', JSON.stringify(savedProfile));
+  };
 
   const handleCancel = () => {
     // Reset form to original data
@@ -78,7 +91,7 @@ const ProfileSetting = () => {
       ...prev,
       [name]: value
     }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -106,28 +119,28 @@ const ProfileSetting = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     try {
       setIsSaving(true);
-      
+
       // Simulasi API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Simpan ke localStorage
       localStorage.setItem('userProfile', JSON.stringify(formData));
-      
+
       setIsEditing(true); // Stay in edit mode
       setMessage({
         type: 'success',
         text: 'Profil berhasil diperbarui!'
       });
-      
+
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-      
+
     } catch (error) {
       console.error('Error updating profile:', error);
       setMessage({
@@ -142,10 +155,8 @@ const ProfileSetting = () => {
   const getRoleDisplayName = (role) => {
     const roleNames = {
       'vendor': 'Vendor',
-      'gudang': 'PIC Gudang',
       'pic': 'PIC Gudang',
       'direksi': 'Direksi',
-      'admin': 'Administrator'
     };
     return roleNames[role] || role;
   };
@@ -168,9 +179,10 @@ const ProfileSetting = () => {
       {/* Debug Info - Remove in production */}
       {process.env.NODE_ENV === 'development' && (
         <div className="mb-4 p-3 bg-gray-100 rounded text-xs">
-          <strong>Debug:</strong> User exists: {user ? 'Yes' : 'No'} | 
-          Name: {formData.name} | 
+          <strong>Debug:</strong> User exists: {user ? 'Yes' : 'No'} |
+          Name: {formData.name} |
           Email: {formData.email}
+          Role: {formData.role}
         </div>
       )}
 
@@ -182,7 +194,7 @@ const ProfileSetting = () => {
             Kelola informasi profil dan data pribadi Anda
           </p>
         </div>
-        
+
         {!isEditing && (
           <button
             onClick={handleEdit}
@@ -196,13 +208,12 @@ const ProfileSetting = () => {
 
       {/* Message Alert */}
       {message.text && (
-        <div className={`p-4 rounded-lg mb-6 flex items-center gap-3 ${
-          message.type === 'success' 
-            ? 'bg-green-50 border border-green-200 text-green-800'
-            : message.type === 'error'
+        <div className={`p-4 rounded-lg mb-6 flex items-center gap-3 ${message.type === 'success'
+          ? 'bg-green-50 border border-green-200 text-green-800'
+          : message.type === 'error'
             ? 'bg-red-50 border border-red-200 text-red-800'
             : 'bg-yellow-50 border border-yellow-200 text-yellow-800'
-        }`}>
+          }`}>
           {message.type === 'success' ? (
             <CheckCircle size={20} />
           ) : (
@@ -221,7 +232,7 @@ const ProfileSetting = () => {
                 {formData.name?.charAt(0).toUpperCase() || 'U'}
               </div>
             </div>
-            
+
             <div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {formData.name}
@@ -231,6 +242,11 @@ const ProfileSetting = () => {
                   <User size={14} />
                   {getRoleDisplayName(formData.role)}
                 </span>
+                {formData.signature && (
+                  <span className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full text-sm font-medium">
+                    ✓ Tanda Tangan Tersedia
+                  </span>
+                )}
                 <span className="text-gray-600 dark:text-gray-400 text-sm">
                   Bergabung sejak {formatDate(new Date().toISOString())}
                 </span>
@@ -255,13 +271,12 @@ const ProfileSetting = () => {
                 value={formData.name}
                 onChange={handleChange}
                 disabled={!isEditing}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                  errors.name 
-                    ? 'border-red-300 bg-red-50' 
-                    : isEditing 
-                    ? 'border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white' 
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${errors.name
+                  ? 'border-red-300 bg-red-50'
+                  : isEditing
+                    ? 'border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white'
                     : 'border-gray-200 bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300'
-                }`}
+                  }`}
                 placeholder="Masukkan nama lengkap"
               />
               {errors.name && (
@@ -285,13 +300,12 @@ const ProfileSetting = () => {
                 value={formData.email}
                 onChange={handleChange}
                 disabled={!isEditing}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                  errors.email 
-                    ? 'border-red-300 bg-red-50' 
-                    : isEditing 
-                    ? 'border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white' 
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${errors.email
+                  ? 'border-red-300 bg-red-50'
+                  : isEditing
+                    ? 'border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white'
                     : 'border-gray-200 bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300'
-                }`}
+                  }`}
                 placeholder="nama@perusahaan.com"
               />
               {errors.email && (
@@ -368,6 +382,15 @@ const ProfileSetting = () => {
             </div>
           </div>
 
+          {/* Signature Upload Section */}
+          <div className="border-t border-gray-200 dark:border-gray-700">
+            <SignatureUpload
+              userRole={formData.role}
+              currentSignature={formData.signature}
+              onSignatureUpdate={handleSignatureUpdate}
+            />
+          </div>
+
           {/* Action Buttons */}
           {isEditing && (
             <div className="flex gap-3 pt-6 mt-6 border-t border-gray-200 dark:border-gray-700">
@@ -379,7 +402,7 @@ const ProfileSetting = () => {
                 <Save size={18} />
                 {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
               </button>
-              
+
               <button
                 type="button"
                 onClick={handleCancel}
@@ -392,6 +415,7 @@ const ProfileSetting = () => {
             </div>
           )}
         </form>
+
       </div>
 
       {/* Last Updated Info */}

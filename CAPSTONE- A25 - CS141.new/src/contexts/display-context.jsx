@@ -1,6 +1,5 @@
 // src/contexts/DisplayContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { displayAPI } from '../services/api-service';
 
 const DisplayContext = createContext();
 
@@ -14,7 +13,7 @@ export const useDisplay = () => {
 
 export const DisplayProvider = ({ children }) => {
   const defaultPreferences = {
-    theme: 'light',
+    theme: 'light', // Default light mode
     language: 'id',
     fontSize: 'medium',
     sidebarVisible: true,
@@ -22,47 +21,86 @@ export const DisplayProvider = ({ children }) => {
 
   // Load from localStorage first
   const [preferences, setPreferences] = useState(() => {
+    // PAKSA HAPUS DARK MODE DI AWAL
+    document.documentElement.classList.remove('dark');
+    
     try {
       const saved = localStorage.getItem('displayPreferences');
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        console.log('✅ Loaded display preferences from localStorage:', parsed);
+        
+        // Jika tema dark tersimpan, tapi kita mau mulai dengan light
+        // Uncomment baris ini untuk FORCE reset ke light mode
+        // parsed.theme = 'light';
+        
+        return parsed;
       }
     } catch (error) {
-      console.error('Error loading display preferences:', error);
+      console.error('❌ Error loading display preferences:', error);
     }
+    console.log('ℹ️ Using default display preferences');
     return defaultPreferences;
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [initialized, setInitialized] = useState(false);
 
-  // Apply theme and font size on initial load
+  // Apply theme and font size whenever preferences change
   useEffect(() => {
-    if (!initialized) {
-      applyTheme(preferences.theme);
-      applyFontSize(preferences.fontSize);
-      setInitialized(true);
+    console.log('🎨 Applying theme:', preferences.theme);
+    applyTheme(preferences.theme);
+    applyFontSize(preferences.fontSize);
+  }, [preferences.theme, preferences.fontSize]);
+
+  // Listen to system theme changes when theme is 'system'
+  useEffect(() => {
+    if (preferences.theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      
+      const handleChange = (e) => {
+        console.log('🌐 System theme changed:', e.matches ? 'dark' : 'light');
+        applySystemTheme(e.matches);
+      };
+      
+      mediaQuery.addEventListener('change', handleChange);
+      
+      // Apply immediately on mount
+      applySystemTheme(mediaQuery.matches);
+      
+      return () => {
+        mediaQuery.removeEventListener('change', handleChange);
+      };
     }
-  }, [preferences.theme, preferences.fontSize, initialized]);
+  }, [preferences.theme]);
 
   const applyTheme = (theme) => {
     const root = document.documentElement;
     
-    // Remove all theme classes first
-    root.classList.remove('dark', 'light');
-    
     if (theme === 'dark') {
       root.classList.add('dark');
+      root.classList.remove('light');
+      console.log('✅ Dark mode applied');
     } else if (theme === 'light') {
+      root.classList.remove('dark');
       root.classList.add('light');
+      console.log('✅ Light mode applied');
     } else if (theme === 'system') {
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (isDark) {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
+      applySystemTheme(isDark);
+    }
+  };
+
+  const applySystemTheme = (isDark) => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+      root.classList.remove('light');
+      console.log('✅ System theme: Dark mode applied');
+    } else {
+      root.classList.remove('dark');
+      root.classList.add('light');
+      console.log('✅ System theme: Light mode applied');
     }
   };
 
@@ -72,7 +110,9 @@ export const DisplayProvider = ({ children }) => {
       medium: '16px',
       large: '18px'
     };
-    document.documentElement.style.fontSize = sizes[fontSize] || '16px';
+    const size = sizes[fontSize] || '16px';
+    document.documentElement.style.fontSize = size;
+    console.log('✅ Font size applied:', size);
   };
 
   const updatePreferences = async (newPreferences) => {
@@ -80,6 +120,8 @@ export const DisplayProvider = ({ children }) => {
     setError(null);
     
     try {
+      console.log('💾 Saving preferences:', newPreferences);
+      
       // Apply changes immediately
       if (newPreferences.theme !== preferences.theme) {
         applyTheme(newPreferences.theme);
@@ -93,14 +135,10 @@ export const DisplayProvider = ({ children }) => {
       
       // Save to localStorage
       localStorage.setItem('displayPreferences', JSON.stringify(newPreferences));
+      console.log('✅ Preferences saved to localStorage');
       
-      // Try to save to backend (non-blocking)
-      try {
-        await displayAPI.updatePreferences(newPreferences);
-      } catch (backendError) {
-        console.warn('Failed to save to backend:', backendError.message);
-        // Continue anyway since localStorage is saved
-      }
+      // Simulate API call (500ms delay)
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       setLoading(false);
       return { 
@@ -109,19 +147,20 @@ export const DisplayProvider = ({ children }) => {
         message: 'Preferensi berhasil disimpan'
       };
     } catch (error) {
-      console.error('Error updating display preferences:', error);
+      console.error('❌ Error updating display preferences:', error);
       setError(error.message);
       
       setLoading(false);
       return { 
         success: false, 
         error: 'Gagal menyimpan preferensi',
-        data: preferences // Return old preferences
+        data: preferences
       };
     }
   };
 
   const resetToDefault = async () => {
+    console.log('🔄 Resetting to default preferences');
     return await updatePreferences(defaultPreferences);
   };
 

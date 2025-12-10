@@ -1,51 +1,122 @@
+// src/pages/setting/index.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import ProfileSetting from '../../components/settings/profile-setting';
 import NotificationSetting from '../../components/settings/notification-setting';
 import SecuritySetting from '../../components/settings/security-setting';
 import DisplaySetting from '../../components/settings/display-setting';
+import { useAuth } from '../../contexts/authcontext';
 
 const SettingsPage = () => {
+  const navigate = useNavigate();
+  const { userRole, userEmail, loading } = useAuth(); // TAMBAHKAN loading di sini
   const [activeTab, setActiveTab] = useState('profile');
 
   const tabs = [
-    { id: 'profile', label: 'Profil', component: <ProfileSetting /> },
-    { id: 'security', label: 'Keamanan', component: <SecuritySetting /> },
-    { id: 'notifications', label: 'Notifikasi', component: <NotificationSetting /> },
-    { id: 'display', label: 'Tampilan', component: <DisplaySetting /> },
+    { id: 'profile', label: 'Profil', icon: '👤', component: <ProfileSetting /> },
+    { id: 'security', label: 'Keamanan', icon: '🔒', component: <SecuritySetting /> },
+    { id: 'notifications', label: 'Notifikasi', icon: '🔔', component: <NotificationSetting /> },
+    { id: 'display', label: 'Tampilan', icon: '🎨', component: <DisplaySetting /> },
   ];
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
-          Pengaturan Akun
-        </h1>
+  const getBackPath = () => {
+    console.log('Current user role:', userRole); // Debug
+    
+    switch (userRole) {
+      case 'direksi':
+        return '/direksi/dashboard';
+      case 'gudang':
+        return '/pic-gudang/dashboard';
+      case 'vendor':
+        return '/vendor/dashboard';
+      default:
+        console.warn('Unknown role, redirecting to home');
+        return '/';
+    }
+  };
 
-        <div className="flex flex-col md:flex-row gap-6">
+  const handleBack = () => {
+    const backPath = getBackPath();
+    console.log('Navigating back to:', backPath);
+    navigate(backPath, { replace: true });
+  };
+
+  // Show loading while auth is being checked
+  if (loading) { // SEKARANG loading sudah didefinisikan
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Header */}
+        <div className="mb-6">
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors mb-4"
+          >
+            <ArrowLeft size={20} />
+            <span>Kembali ke Dashboard</span>
+          </button>
+          
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Pengaturan Akun
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Kelola profil, keamanan, notifikasi, dan preferensi tampilan
+          </p>
+          {/* <div className="text-sm text-gray-500 mt-1">
+            Login sebagai: {userEmail} ({userRole})
+          </div> */}
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar Tabs */}
-          <div className="md:w-1/4">
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <nav className="space-y-2">
+          <div className="lg:w-64 flex-shrink-0">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-2">
+              <nav className="space-y-1">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full text-left px-4 py-3 rounded-md transition-colors ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-left ${
                       activeTab === tab.id
-                        ? 'bg-blue-50 text-blue-600 font-medium'
-                        : 'text-gray-600 hover:bg-gray-50'
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium shadow-sm'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
                     }`}
                   >
-                    {tab.label}
+                    <span className="text-xl">{tab.icon}</span>
+                    <span>{tab.label}</span>
                   </button>
                 ))}
               </nav>
             </div>
+
+            {/* Help Section */}
+            <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+              <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
+                💡 Butuh Bantuan?
+              </h3>
+              <p className="text-sm text-blue-800 dark:text-blue-400 mb-3">
+                Jika mengalami kesulitan, hubungi tim support kami
+              </p>
+              <a
+                href="mailto:support@digiba.com"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                support@digiba.com
+              </a>
+            </div>
           </div>
 
           {/* Content Area */}
-          <div className="md:w-3/4">
-            <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
+          <div className="flex-1 min-w-0">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
               {tabs.find(tab => tab.id === activeTab)?.component}
             </div>
           </div>
